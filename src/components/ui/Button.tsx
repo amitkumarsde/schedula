@@ -8,6 +8,7 @@ type ButtonProps = {
   fullWidth?: boolean;
   type?: "button" | "submit";
   disabled?: boolean;
+  onClick?: () => void;
 };
 
 const STYLE_BY_VARIANT = {
@@ -22,6 +23,7 @@ export default function Button({
   fullWidth = false,
   type = "button",
   disabled = false,
+  onClick,
 }: ButtonProps) {
   const styles = [
     "inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3",
@@ -40,7 +42,7 @@ export default function Button({
   }
 
   return (
-    <button type={type} disabled={disabled} className={styles}>
+    <button type={type} disabled={disabled} onClick={onClick} className={styles}>
       {children}
     </button>
   );

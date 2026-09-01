@@ -8,7 +8,7 @@ import Button from "@/components/ui/Button";
 
 const HOW_MANY_TO_SHOW = 6;
 
-// Shows the first few doctors on the home page.
+// Shows the top doctors on the home page.
 export default function FeaturedDoctors() {
   const { doctors, isLoading, errorMessage } = useDoctors();
 

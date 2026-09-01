@@ -8,12 +8,12 @@ type Session = { user: LoggedInUser | null; isLoading: boolean };
 
 type AuthValue = Session & {
   login: (user: LoggedInUser) => void;
+  updateUser: (user: LoggedInUser) => void;
   logout: () => void;
 };
 
 const AuthContext = createContext<AuthValue | null>(null);
 
-// Keeps the logged in user in one place, so the header updates the moment someone logs in.
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session>({ user: null, isLoading: true });
 
@@ -23,7 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession({ user: readLoggedInUser(), isLoading: false });
   }, []);
 
-  function login(user: LoggedInUser) {
+  function saveUser(user: LoggedInUser) {
     saveLoggedInUser(user);
     setSession({ user, isLoading: false });
   }
@@ -33,12 +33,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession({ user: null, isLoading: false });
   }
 
+  // login and updateUser do the same job, but the two names make the calling code easy to read.
   return (
-    <AuthContext.Provider value={{ ...session, login, logout }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ ...session, login: saveUser, updateUser: saveUser, logout }}>
+      {children}
+    </AuthContext.Provider>
   );
 }
 
-// Gives any component the logged in user and the login / logout actions.
 export function useAuth() {
   const value = useContext(AuthContext);
   if (!value) throw new Error("useAuth must be used inside AuthProvider");

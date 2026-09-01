@@ -4,11 +4,13 @@ import { sendSuccess, sendError, handleApiError, isDuplicateKeyError } from "@/l
 import { readJsonBody, isNonEmptyText } from "@/lib/utils/apiRequest";
 import { toSafeUser } from "@/lib/auth/toSafeUser";
 import User from "@/lib/models/User";
+import Patient from "@/lib/models/Patient";
+import Doctor from "@/lib/models/Doctor";
 
 // A short check for "something@something.something" with no spaces.
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// POST /api/auth/signup - creates a new account as a patient or a doctor.
+// Creates a new account as a patient or a doctor.
 export async function POST(request: NextRequest) {
   try {
     const body = await readJsonBody(request);
@@ -45,6 +47,12 @@ export async function POST(request: NextRequest) {
     if (existingUser) return sendError("This email is already registered", 409);
 
     const user = await User.create({ fullName: cleanFullName, email: cleanEmail, password, role });
+
+    if (role === "patient") {
+      await Patient.create({ userId: user._id, fullName: cleanFullName });
+    } else {
+      await Doctor.create({ userId: user._id, fullName: cleanFullName });
+    }
 
     return sendSuccess({ message: "Account created successfully", user: toSafeUser(user) }, 201);
   } catch (error) {

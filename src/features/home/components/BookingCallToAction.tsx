@@ -3,7 +3,7 @@
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/lib/auth/AuthContext";
 
-// The last of the home page. The signup button is hidden once someone is logged in.
+// The call to action section on the home page.
 export default function BookingCallToAction() {
   const { user, isLoading } = useAuth();
 

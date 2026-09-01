@@ -26,13 +26,31 @@ export default function Header() {
         </Link>
 
         <div className="flex items-center gap-2">
+          <Link
+            href="/doctors"
+            className="hidden px-3 py-2 text-sm font-semibold text-ink hover:text-brand sm:block"
+          >
+            Doctors
+          </Link>
+
           {/* Nothing is shown until we know who is logged in, so the buttons do not flash. */}
           {isLoading ? null : user ? (
             <>
-              <span className="hidden max-w-[180px] items-center gap-2 truncate rounded-xl bg-surface px-3 py-2 text-sm font-medium text-ink sm:flex">
+              <Link
+                href="/appointments"
+                className="hidden px-3 py-2 text-sm font-semibold text-ink hover:text-brand sm:block"
+              >
+                Appointments
+              </Link>
+
+              {/* On a small screen only the icon is shown, so the header stays short. */}
+              <Link
+                href="/profile"
+                className="flex items-center gap-2 rounded-xl bg-surface px-3 py-2 text-sm font-medium text-ink transition-colors hover:text-brand"
+              >
                 <User className="h-4 w-4 shrink-0 text-brand" />
-                {user.fullName}
-              </span>
+                <span className="hidden max-w-[140px] truncate sm:inline">{user.fullName}</span>
+              </Link>
 
               <button
                 type="button"
@@ -51,7 +69,9 @@ export default function Header() {
               >
                 Login
               </Link>
-              <Button href="/signup">Sign Up</Button>
+              <Button href="/signup">
+                Sign Up
+              </Button>
             </>
           )}
         </div>

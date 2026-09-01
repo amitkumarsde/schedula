@@ -1,11 +1,15 @@
+import Link from "next/link";
 import Image from "next/image";
 import { Star, User } from "lucide-react";
 import type { Doctor } from "@/types";
 
-// One doctor card used on the home page and the doctors page.
+// One doctor card that links to the doctor page.
 export default function DoctorCard({ doctor }: { doctor: Doctor }) {
   return (
-    <div className="flex gap-4 rounded-2xl border border-line bg-card p-4">
+    <Link
+      href={`/doctors/${doctor._id}`}
+      className="flex gap-4 rounded-2xl border border-line bg-card p-4 transition-colors hover:border-brand"
+    >
       {doctor.profileImage ? (
         <Image
           src={doctor.profileImage}
@@ -39,6 +43,6 @@ export default function DoctorCard({ doctor }: { doctor: Doctor }) {
         {/* line-clamp keeps the text to two lines so all cards stay the same height. */}
         <p className="mt-2 line-clamp-2 text-sm text-muted">{doctor.about}</p>
       </div>
-    </div>
+    </Link>
   );
 }

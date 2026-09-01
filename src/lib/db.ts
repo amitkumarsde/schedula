@@ -17,7 +17,6 @@ const globalForMongoose = global as typeof globalThis & { mongooseCache?: Mongoo
 const cache: MongooseCache = globalForMongoose.mongooseCache ?? { connection: null, promise: null };
 globalForMongoose.mongooseCache = cache;
 
-// Opens the database connection once and gives the same one back to every API route.
 export async function connectToDatabase() {
   if (cache.connection) return cache.connection;
 

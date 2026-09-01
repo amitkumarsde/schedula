@@ -1,4 +1,8 @@
-// One patient profile as the API sends it.
+export type FileLink = {
+  name: string;
+  url: string;
+};
+
 export type Patient = {
   _id: string;
   fullName: string;
@@ -6,7 +10,11 @@ export type Patient = {
   gender: "male" | "female" | "other";
   profileImage: string;
   mobileNumber: string;
-  weight: number;
   bloodGroup: string;
+  weight: number;
   city: string;
+  allergies: string[];
+  diseases: string[];
+  documents: FileLink[];
+  testReports: FileLink[];
 };

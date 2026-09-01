@@ -6,9 +6,9 @@ type FormInputProps = {
   type?: string;
   placeholder?: string;
   hint?: string;
+  required?: boolean;
 };
 
-// One labelled input box, so every form in the app looks the same.
 export default function FormInput({
   label,
   name,
@@ -17,6 +17,7 @@ export default function FormInput({
   type = "text",
   placeholder,
   hint,
+  required = false,
 }: FormInputProps) {
   return (
     <div>
@@ -30,6 +31,7 @@ export default function FormInput({
         type={type}
         value={value}
         placeholder={placeholder}
+        required={required}
         onChange={(event) => onChange(event.target.value)}
         className="w-full rounded-xl border border-line bg-card px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-muted focus:border-brand"
       />

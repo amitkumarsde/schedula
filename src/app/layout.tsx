@@ -15,7 +15,6 @@ export const metadata: Metadata = {
   description: "Book an appointment with a doctor in a few simple steps",
 };
 
-// Wraps every page with the font, the logged in user, and the header and footer.
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${geistSans.variable} h-full antialiased`}>

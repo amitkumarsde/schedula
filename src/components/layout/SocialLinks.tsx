@@ -21,7 +21,6 @@ const SOCIAL_LINKS = [
   },
 ];
 
-// Shows the social icons row in the footer.
 export default function SocialLinks() {
   return (
     <div className="flex items-center gap-3">

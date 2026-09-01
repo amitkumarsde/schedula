@@ -10,7 +10,7 @@ import Button from "@/components/ui/Button";
 import { loginUser } from "@/features/auth/api/authService";
 import { useAuth } from "@/lib/auth/AuthContext";
 
-// The login form, with the email and password.
+// The login form.
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,6 +21,7 @@ export default function LoginForm() {
   const router = useRouter();
   const { login } = useAuth();
 
+  // Sends the form to the API when submitted.
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     setErrorMessage("");

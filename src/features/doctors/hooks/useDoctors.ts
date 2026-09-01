@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getDoctors } from "@/features/doctors/api/doctorService";
 import type { Doctor } from "@/types";
 
-// Loads the doctors list and reports whether it is still loading or failed.
+// Loads the doctors list.
 export function useDoctors(search = "", specialization = "") {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -14,6 +14,7 @@ export function useDoctors(search = "", specialization = "") {
     // Ignores an old reply that arrives after a newer one, so the list never shows stale data.
     let isCurrentRequest = true;
 
+    // Fetches the doctors from the API.
     async function loadDoctors() {
       setIsLoading(true);
       setErrorMessage("");

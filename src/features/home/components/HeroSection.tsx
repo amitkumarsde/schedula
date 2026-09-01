@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import { Search, CalendarCheck, ShieldCheck, Clock } from "lucide-react";
 import Button from "@/components/ui/Button";
 
-// The top of the home page, with a search box that opens the doctors page.
+// The top section of the home page.
 export default function HeroSection() {
   const [searchText, setSearchText] = useState("");
   const router = useRouter();
 
+  // Opens the doctors page with the typed search.
   function handleSearch(event: React.FormEvent) {
     event.preventDefault();
     const cleanText = searchText.trim();

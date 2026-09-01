@@ -5,7 +5,7 @@ import { readJsonBody, isNonEmptyText } from "@/lib/utils/apiRequest";
 import { toSafeUser } from "@/lib/auth/toSafeUser";
 import User from "@/lib/models/User";
 
-// POST /api/auth/login - checks the email and password and returns the user.
+// Checks the email and password and returns the user.
 export async function POST(request: NextRequest) {
   try {
     const body = await readJsonBody(request);

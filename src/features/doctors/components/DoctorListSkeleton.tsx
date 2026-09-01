@@ -1,4 +1,4 @@
-// Grey placeholder cards shown while the doctors are loading, so the page does not jump.
+// Grey placeholder cards shown while doctors load.
 export default function DoctorListSkeleton({ count = 6 }: { count?: number }) {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

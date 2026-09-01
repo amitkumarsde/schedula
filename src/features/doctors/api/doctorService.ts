@@ -1,7 +1,7 @@
 import { apiGet } from "@/lib/api/apiClient";
 import type { Doctor } from "@/types";
 
-// Loads the doctors list, filtered by search text and specialization when given.
+// Loads the doctors list with optional search and filter.
 export async function getDoctors(search = "", specialization = ""): Promise<Doctor[]> {
   const query = new URLSearchParams();
 
@@ -12,4 +12,10 @@ export async function getDoctors(search = "", specialization = ""): Promise<Doct
   const data = await apiGet(`/doctors${queryText ? `?${queryText}` : ""}`);
 
   return data.doctors;
+}
+
+// Loads one doctor by id.
+export async function getDoctorById(doctorId: string): Promise<Doctor> {
+  const data = await apiGet(`/doctors/${doctorId}`);
+  return data.doctor;
 }

@@ -33,6 +33,7 @@ export default function SignupForm() {
   const router = useRouter();
   const { login } = useAuth();
 
+  // Sends the form to the API when submitted.
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     setErrorMessage("");
@@ -66,7 +67,7 @@ export default function SignupForm() {
     try {
       const user = await signupUser(cleanFullName, cleanEmail, password, role);
       login(user);
-      router.push("/doctors");
+      router.push("/profile");
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Could not create the account");
       setIsSaving(false);

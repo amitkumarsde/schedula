@@ -1,7 +1,7 @@
 import { apiPost } from "@/lib/api/apiClient";
 import type { LoggedInUser, UserRole } from "@/types";
 
-// Creates a new account and returns the logged in user.
+// Creates a new account and returns the user.
 export async function signupUser(
   fullName: string,
   email: string,
@@ -12,7 +12,7 @@ export async function signupUser(
   return data.user;
 }
 
-// Checks the email and password and returns the logged in user.
+// Checks the login and returns the user.
 export async function loginUser(email: string, password: string): Promise<LoggedInUser> {
   const data = await apiPost("/auth/login", { email, password });
   return data.user;

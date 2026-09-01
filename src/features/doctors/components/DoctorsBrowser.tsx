@@ -8,7 +8,7 @@ import DoctorCard from "@/features/doctors/components/DoctorCard";
 import DoctorListSkeleton from "@/features/doctors/components/DoctorListSkeleton";
 import Alert from "@/components/ui/Alert";
 
-// The doctors page: a search box, specialization chips and the list of doctors.
+// The doctors page with search and specialization filter.
 export default function DoctorsBrowser() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -19,7 +19,7 @@ export default function DoctorsBrowser() {
 
   const { doctors, isLoading, errorMessage } = useDoctors(search, specialization);
 
-  // Puts the chosen filters into the URL, which reloads the list.
+  // Puts the chosen filters into the URL.
   function applyFilters(nextSearch: string, nextSpecialization: string) {
     const query = new URLSearchParams();
     if (nextSearch) query.set("search", nextSearch);
@@ -29,6 +29,7 @@ export default function DoctorsBrowser() {
     router.push(queryText ? `/doctors?${queryText}` : "/doctors");
   }
 
+  // Runs the search when the box is submitted.
   function handleSearchSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const typedText = String(new FormData(event.currentTarget).get("search") ?? "");

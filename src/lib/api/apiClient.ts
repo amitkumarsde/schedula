@@ -21,16 +21,27 @@ async function request(path: string, options?: RequestInit) {
   return data;
 }
 
-// Reads data from our API.
 export async function apiGet(path: string) {
   return request(path);
 }
 
-// Sends data to our API.
-export async function apiPost(path: string, body: unknown) {
+// Sends a JSON body to our API. POST and PUT only differ by the method name.
+function sendJson(path: string, method: string, body: unknown) {
   return request(path, {
-    method: "POST",
+    method,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
+}
+
+export async function apiPost(path: string, body: unknown) {
+  return sendJson(path, "POST", body);
+}
+
+export async function apiPut(path: string, body: unknown) {
+  return sendJson(path, "PUT", body);
+}
+
+export async function apiPatch(path: string, body: unknown) {
+  return sendJson(path, "PATCH", body);
 }

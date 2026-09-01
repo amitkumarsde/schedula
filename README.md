@@ -1,6 +1,8 @@
 # Schedula
 
-A doctor appointment app. Right now a person can create an account, log in, and look through the list of doctors with search and specialization filters.
+A doctor appointment app. A person can create an account, log in, fill their profile, browse doctors, and a patient can book an appointment with a doctor.
+
+> New here? Read **[patient.md](patient.md)** for the patient story (signup to booking) and **[doctor.md](doctor.md)** for the doctor story (signup to getting appointments). Both list the exact files each role uses.
 
 ---
 
@@ -12,6 +14,9 @@ A doctor appointment app. Right now a person can create an account, log in, and 
 - Doctors page with all available doctors
 - Search a doctor by name, specialization or city
 - Filter doctors by specialization
+- **Profile page** with tabs. A patient fills basic info, medical history, documents and test reports. A doctor fills basic info, professional details and availability (days, times, fee)
+- **Booking** for a patient: pick a doctor, pick a date on a calendar, pick a slot, choose visit type and meet type, add the problem, and confirm
+- **Appointments page** for both roles, with Upcoming, Completed and Cancelled tabs, and a detail page where a patient can cancel and a doctor can complete or cancel
 
 ---
 
@@ -75,41 +80,44 @@ npm run build
 
 ```
 schedula/
-├── seed/                        Sample data to insert into MongoDB by hand
+├── README.md                   This file
+├── TASK.md                     Daily work log
+├── patient.md                  The patient story and the patient files
+├── doctor.md                   The doctor story and the doctor files
+├── seed/                       Sample data to insert into MongoDB
 │   ├── users.json
 │   └── doctors.json
 └── src/
-    ├── app/ 
+    ├── app/                    Pages and API (the folder path is the URL)
     │   ├── api/
-    │   │   ├── auth/signup/     Create an account
-    │   │   ├── auth/login/      Check email and password
-    │   │   └── doctors/         The doctors list
-    │   ├── globals.css
-    │   ├── layout.tsx
-    │   ├── page.tsx
-    │   ├── doctors/page.tsx
-    │   ├── login/page.tsx
-    │   └── signup/page.tsx
-    ├── features/
-    │   ├── auth/
-    │   │   ├── api/             Calls the signup and login API
-    │   │   └── components/      LoginForm, SignupForm
-    │   ├── doctors/
-    │   │   ├── api/             Calls the doctors API
-    │   │   ├── components/      DoctorCard, DoctorsBrowser, FeaturedDoctors
-    │   │   └── hooks/           useDoctors, loads the doctors list
-    │   └── home/
-    │       └── components/
+    │   │   ├── auth/           signup, login
+    │   │   ├── doctors/        list, one doctor, free slots
+    │   │   ├── appointments/   list, book, one appointment
+    │   │   └── profile/        patient profile, doctor profile
+    │   ├── login/              Login pages
+        ├── signup/             Signup pages
+    │   ├── doctors/            Doctors list, one doctor, booking page
+    │   ├── appointments/       My appointments, one appointment
+    │   ├── profile/            Redirect by role, patient profile, doctor profile
+    │   ├── layout.tsx          Header and footer on every page
+    │   └── page.tsx            Home page
+    ├── features/               
+    │   ├── auth/               Login and signup forms + API calls
+    │   ├── doctors/            Doctor cards, list, public profile page
+    │   ├── appointments/       Booking flow, calendar, slots, lists
+    │   ├── profile/            Patient and doctor profile
+    │   └── home/               Home page sections
     ├── components/
-    │   ├── ui/     
-    │   └── layout/ 
+    │   ├── ui/                 Buttons, inputs, avatar, etc
+    │   └── layout/             Header, footer
     ├── lib/
-    │   ├── api/                 One fetch helper for the whole app
-    │   ├── auth/                Keeps the logged in user
-    │   ├── models/              Mongoose schemas
-    │   ├── utils/               Small helpers
-    │   └── db.ts                Database connection
-    └── types/                   Shared TypeScript types
+    │   ├── api/                One fetch helper for the whole app
+    │   ├── auth/               Keeps the logged in user
+    │   ├── models/             Mongoose schemas
+    │   ├── profile/            Server side checks for the profile tabs
+    │   ├── utils/              Small helpers
+    │   └── db.ts               Database connection
+    └── types/                  Shared TypeScript types
 ```
 
 **Where the layout lives.** In the App Router, `layout.tsx` is the file for anything shown on every page. The header and footer sit there, so no page has to import them.
@@ -137,9 +145,21 @@ Every reply has the same shape:
 
 | Method | URL | What it does |
 |---|---|---|
-| POST | `/api/auth/signup` | Create an account. Needs `fullName`, `email`, `password`, `role` |
+| POST | `/api/auth/signup` | Create an account. Needs `fullName`, `email`, `password`, `role`. Also makes an empty profile |
 | POST | `/api/auth/login` | Check the email and password, returns the user |
 | GET | `/api/doctors` | The doctors list. `?search=` and `?specialization=` are optional |
+| GET | `/api/doctors/[id]` | One doctor's full profile |
+| GET | `/api/doctors/[id]/slots?date=` | The free and taken time slots for that day |
+| GET | `/api/profile/patient?userId=` | The patient's saved profile |
+| PUT | `/api/profile/patient` | Save one tab of the patient profile |
+| GET | `/api/profile/doctor?userId=` | The doctor's saved profile |
+| PUT | `/api/profile/doctor` | Save one tab of the doctor profile |
+| GET | `/api/appointments?userId=` | My appointments (patient or doctor, based on the role) |
+| POST | `/api/appointments` | Book one appointment (patient only) |
+| GET | `/api/appointments/[id]?userId=` | One appointment, only for the people on it |
+| PATCH | `/api/appointments/[id]` | Cancel or complete one appointment |
+
+The profile and appointment APIs need a `userId` so the server knows whose data to read or save.
 
 ---
 
@@ -151,17 +171,21 @@ Every reply has the same shape:
 |---|---|
 | fullName | The person's name, asked at signup |
 | email | Login email, saved in small letters, cannot repeat |
-| password | Plain text for now, see the note at the end |
+| password | Plain text for now, see the notes at the end |
 | role | `patient` or `doctor` |
-| isProfileComplete | Ready for the profile screens, not used yet |
+| isProfileComplete | Turns `true` when the profile "Basic info" tab is saved |
 
 **doctors** — the doctor profile
 
-Name, gender, photo, specialization, qualification, experience, city, fee, rating and an `isAvailable` switch. Only doctors with `isAvailable: true` appear in the list.
+Name, gender, photo, mobile number, specialization, qualification, experience, city, hospital, fee, rating, total patients and reviews. It also has the consulting **days**, **morning and evening times**, **slot length** and an `isAvailable` switch. A new doctor starts with `isAvailable: false`, and only doctors with `isAvailable: true` (and a specialization) appear in the doctors list.
 
 **patients** — the patient profile
 
-Name, Age, gender, photo, mobile number, weight, blood group and city.
+Name, age, gender, photo, mobile number, weight, blood group, city, **allergies** and **diseases** (saved as lists), and **documents** and **testReports** (saved as `{ name, link }` items).
+
+**appointments** — one booking
+
+Appointment number, the patient and doctor ids, a copy of the doctor name, specialization and fee, the patient name, the date and slot time, the problem, the visit type, the meet type, and a status of `upcoming`, `completed` or `cancelled`.
 
 ---
 

@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
 import { Error as MongooseError } from "mongoose";
 
-// Sends a successful reply in the same shape for every route.
 export function sendSuccess(data: Record<string, unknown>, status = 200) {
   return NextResponse.json({ success: true, ...data }, { status });
 }
 
-// Sends a failed reply with a message the user can read.
 export function sendError(message: string, status = 400) {
   return NextResponse.json({ success: false, message }, { status });
 }

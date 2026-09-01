@@ -1,8 +1,7 @@
-// One doctor profile as the API sends it.
 export type Doctor = {
   _id: string;
   fullName: string;
-  gender: "male" | "female";
+  gender: "male" | "female" | "other";
   profileImage: string;
   mobileNumber: string;
   specialization: string;
@@ -15,5 +14,11 @@ export type Doctor = {
   rating: number;
   totalPatients: number;
   totalReviews: number;
+  availableDays: string[];
+  morningStartTime: string;
+  morningEndTime: string;
+  eveningStartTime: string;
+  eveningEndTime: string;
+  slotDurationMinutes: number;
   isAvailable: boolean;
 };

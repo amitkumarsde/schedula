@@ -5,7 +5,6 @@ import SocialLinks from "@/components/layout/SocialLinks";
 const QUICK_LINKS = [
   { label: "Home", href: "/" },
   { label: "Find a Doctor", href: "/doctors" },
-  { label: "Sign Up", href: "/signup" },
 ];
 
 const LEGAL_LINKS = [

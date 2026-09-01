@@ -3,7 +3,7 @@ import { connectToDatabase } from "@/lib/db";
 import { sendSuccess, handleApiError } from "@/lib/utils/apiResponse";
 import Doctor from "@/lib/models/Doctor";
 
-// GET /api/doctors - the doctors list, with optional ?search= and ?specialization=
+// Returns the doctors list with optional search and filter.
 export async function GET(request: NextRequest) {
   try {
     await connectToDatabase();

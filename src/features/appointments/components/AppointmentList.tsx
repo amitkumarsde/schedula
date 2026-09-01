@@ -1,0 +1,92 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { CalendarX } from "lucide-react";
+import Alert from "@/components/ui/Alert";
+import Button from "@/components/ui/Button";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { useMyAppointments } from "@/features/appointments/hooks/useMyAppointments";
+import AppointmentCard from "@/features/appointments/components/AppointmentCard";
+import type { AppointmentStatus } from "@/types";
+
+// The three tabs, matching the three appointment states.
+const TABS: { key: AppointmentStatus; label: string }[] = [
+  { key: "upcoming", label: "Upcoming" },
+  { key: "completed", label: "Completed" },
+  { key: "cancelled", label: "Cancelled" },
+];
+
+// The appointments page with a tab for each status.
+export default function AppointmentList() {
+  const { user, isLoading: isAuthLoading } = useAuth();
+  const router = useRouter();
+  const { appointments, isLoading, errorMessage } = useMyAppointments(user?._id ?? "");
+  const [activeTab, setActiveTab] = useState<AppointmentStatus>("upcoming");
+
+  useEffect(() => {
+    if (!isAuthLoading && !user) router.push("/login");
+  }, [isAuthLoading, user, router]);
+
+  if (isAuthLoading || !user) return null;
+
+  const shownAppointments = appointments.filter((appointment) => appointment.status === activeTab);
+  const isPatient = user.role === "patient";
+
+  return (
+    <div className="mx-auto max-w-6xl px-4 py-10">
+      <h1 className="text-2xl font-bold text-ink sm:text-3xl">My appointments</h1>
+      <p className="mt-1.5 text-sm text-muted">All your booked appointments in one place.</p>
+
+      <div className="no-scrollbar mt-6 flex gap-1 overflow-x-auto rounded-xl border border-line bg-surface p-1">
+        {TABS.map((tab) => {
+          const isActive = tab.key === activeTab;
+
+          return (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => setActiveTab(tab.key)}
+              className={`flex-1 cursor-pointer rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
+                isActive ? "bg-card text-brand shadow-sm" : "text-muted hover:text-ink"
+              }`}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="mt-6">
+        {isLoading && <div className="h-24 animate-pulse rounded-2xl bg-surface" />}
+
+        {!isLoading && errorMessage && <Alert message={errorMessage} />}
+
+        {!isLoading && !errorMessage && shownAppointments.length === 0 && (
+          <div className="rounded-2xl border border-line bg-surface p-12 text-center">
+            <CalendarX className="mx-auto h-10 w-10 text-muted" />
+            <p className="mt-4 font-semibold text-ink">No {activeTab} appointments</p>
+
+            {isPatient && activeTab === "upcoming" && (
+              <div className="mt-5 flex justify-center">
+                <Button href="/doctors">Book appointment</Button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {!isLoading && shownAppointments.length > 0 && (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {shownAppointments.map((appointment) => (
+              <AppointmentCard
+                key={appointment._id}
+                appointment={appointment}
+                viewerRole={user.role}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
