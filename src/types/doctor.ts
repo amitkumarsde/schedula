@@ -1,3 +1,11 @@
+export type Notification = {
+  _id: string;
+  message: string;
+  appointmentId?: string;
+  isRead: boolean;
+  createdAt: string;
+};
+
 export type Doctor = {
   _id: string;
   fullName: string;
@@ -15,10 +23,13 @@ export type Doctor = {
   totalPatients: number;
   totalReviews: number;
   availableDays: string[];
-  morningStartTime: string;
-  morningEndTime: string;
-  eveningStartTime: string;
-  eveningEndTime: string;
-  slotDurationMinutes: number;
+  startTime: string;
+  endTime: string;
+  slotDuration: number;
+  breakDuration: number;
+  visitTypes: string[];
+  meetTypes: string[];
+  consultTypes: string[];
   isAvailable: boolean;
+  notifications: Notification[];
 };

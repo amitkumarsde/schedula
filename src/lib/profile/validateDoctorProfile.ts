@@ -1,6 +1,7 @@
 import { readOptionalText } from "@/lib/utils/apiRequest";
-import { MOBILE_NUMBER_PATTERN, DOCTOR_GENDER_OPTIONS, WEEK_DAYS, SLOT_DURATIONS } from "@/lib/utils/profileOptions";
+import { MOBILE_NUMBER_PATTERN, DOCTOR_GENDER_OPTIONS, WEEK_DAYS, SLOT_DURATIONS, BREAK_DURATIONS } from "@/lib/utils/profileOptions";
 import { SPECIALIZATIONS } from "@/lib/utils/specializations";
+import { VISIT_TYPES, MEET_TYPES, CONSULT_TYPES } from "@/lib/utils/appointmentOptions";
 import { CheckResult, fail, ok } from "@/lib/profile/checkResult";
 
 // A time like "09:30" in 24 hour form.
@@ -64,27 +65,44 @@ export function validateDoctorProfessional(body: Record<string, unknown>): Check
   return ok({ specialization, qualification, experienceYears, about, hospitalName });
 }
 
+// Keeps only the values that are in the allowed list, so a wrong value is never saved.
+function keepAllowed(value: unknown, allowed: string[]): string[] {
+  if (!Array.isArray(value)) return [];
+  return allowed.filter((one) => value.includes(one));
+}
+
 export function validateDoctorAvailability(body: Record<string, unknown>): CheckResult {
   const days = Array.isArray(body.availableDays) ? body.availableDays : [];
-  const morningStartTime = readOptionalText(body.morningStartTime);
-  const morningEndTime = readOptionalText(body.morningEndTime);
-  const eveningStartTime = readOptionalText(body.eveningStartTime);
-  const eveningEndTime = readOptionalText(body.eveningEndTime);
+  const startTime = readOptionalText(body.startTime);
+  const endTime = readOptionalText(body.endTime);
 
-  const slotDurationMinutes = Number(body.slotDurationMinutes);
+  const visitTypes = keepAllowed(body.visitTypes, VISIT_TYPES);
+  const meetTypes = keepAllowed(body.meetTypes, MEET_TYPES);
+  const consultTypes = keepAllowed(body.consultTypes, CONSULT_TYPES);
+
+  const slotDuration = Number(body.slotDuration);
+  const breakDuration = Number(body.breakDuration) || 0;
   const consultationFee = Number(body.consultationFee);
   const isAvailable = body.isAvailable === true;
 
   // Keep only real day names, so a wrong value can never be saved.
   const availableDays = days.filter((day): day is string => WEEK_DAYS.includes(day as string));
 
-  const allTimes = [morningStartTime, morningEndTime, eveningStartTime, eveningEndTime];
-  if (allTimes.some((time) => time && !TIME_PATTERN.test(time))) {
+  if ([startTime, endTime].some((time) => time && !TIME_PATTERN.test(time))) {
     return fail("Time must be in the 24 hour form, like 09:30");
   }
 
-  if (!SLOT_DURATIONS.includes(slotDurationMinutes)) {
+  // When both times are set, the day must start before it ends.
+  if (startTime && endTime && startTime >= endTime) {
+    return fail("Start time must be before the end time");
+  }
+
+  if (!SLOT_DURATIONS.includes(slotDuration)) {
     return fail("Please pick a slot length from the list");
+  }
+
+  if (!BREAK_DURATIONS.includes(breakDuration)) {
+    return fail("Please pick a break length from the list");
   }
 
   if (!Number.isFinite(consultationFee) || consultationFee < 0 || consultationFee > 100000) {
@@ -96,13 +114,25 @@ export function validateDoctorAvailability(body: Record<string, unknown>): Check
     return fail("Pick at least one day before you turn on booking");
   }
 
+  // Without a start and end time there are no slots to book, so both are required to list.
+  if (isAvailable && (!startTime || !endTime)) {
+    return fail("Add a start and end time before you turn on booking");
+  }
+
+  // A patient must have at least one choice in each of the three lists.
+  if (isAvailable && (!visitTypes.length || !meetTypes.length || !consultTypes.length)) {
+    return fail("Pick at least one visit type, meet type and consult type");
+  }
+
   return ok({
     availableDays,
-    morningStartTime,
-    morningEndTime,
-    eveningStartTime,
-    eveningEndTime,
-    slotDurationMinutes,
+    startTime,
+    endTime,
+    slotDuration,
+    breakDuration,
+    visitTypes,
+    meetTypes,
+    consultTypes,
     consultationFee,
     isAvailable,
   });

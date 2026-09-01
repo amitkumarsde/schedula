@@ -5,19 +5,17 @@ import FormInput from "@/components/ui/FormInput";
 import FormSelect from "@/components/ui/FormSelect";
 import FormTextarea from "@/components/ui/FormTextarea";
 import Alert from "@/components/ui/Alert";
-import ProfileField from "@/features/profile/components/ProfileField";
-import EditableCard from "@/features/profile/components/EditableCard";
-import EditActions from "@/features/profile/components/EditActions";
-import { useEditableSection } from "@/features/profile/hooks/useEditableSection";
+import SaveButton from "@/features/profile/components/SaveButton";
+import { useSaveForm } from "@/features/profile/hooks/useSaveForm";
 import { saveDoctorProfileSection } from "@/features/profile/api/doctorProfileService";
 import { SPECIALIZATIONS } from "@/lib/utils/specializations";
 import type { Doctor } from "@/types";
 
-type DoctorProfessionalProps = { doctor: Doctor; userId: string; onSaved: () => void };
+type DoctorProfessionalProps = { doctor: Doctor; userId: string };
 
-// The doctor professional tab.
-export default function DoctorProfessional({ doctor, userId, onSaved }: DoctorProfessionalProps) {
-  const editor = useEditableSection(onSaved);
+// The doctor professional details form.
+export default function DoctorProfessional({ doctor, userId }: DoctorProfessionalProps) {
+  const form = useSaveForm();
 
   const [values, setValues] = useState({
     specialization: doctor.specialization ?? "",
@@ -35,7 +33,7 @@ export default function DoctorProfessional({ doctor, userId, onSaved }: DoctorPr
   // Sends the form to the API when submitted.
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    editor.runSave(async () => {
+    form.runSave(async () => {
       await saveDoctorProfileSection(userId, "professional", {
         ...values,
         experienceYears: Number(values.experienceYears),
@@ -43,34 +41,11 @@ export default function DoctorProfessional({ doctor, userId, onSaved }: DoctorPr
     });
   }
 
-  if (!editor.isEditing) {
-    return (
-      <div className="space-y-4">
-        <EditableCard title="Professional" onEdit={editor.openEditor}>
-          <div className="grid grid-cols-2 gap-5 sm:grid-cols-3">
-            <ProfileField label="Specialization" value={doctor.specialization} />
-            <ProfileField label="Qualification" value={doctor.qualification} />
-            <ProfileField
-              label="Experience"
-              value={doctor.experienceYears ? `${doctor.experienceYears} years` : ""}
-            />
-            <ProfileField label="Hospital" value={doctor.hospitalName} />
-          </div>
-        </EditableCard>
-
-        <div className="rounded-2xl border border-line bg-card p-6">
-          <h3 className="font-bold text-ink">About you</h3>
-          <p className="mt-2 text-sm leading-relaxed text-muted">{doctor.about || "Not added"}</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-line bg-card p-6">
-      <h3 className="font-bold text-ink">Edit professional details</h3>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <h3 className="font-bold text-ink">Professional details</h3>
 
-      {editor.errorMessage && <Alert message={editor.errorMessage} />}
+      {form.errorMessage && <Alert message={form.errorMessage} />}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <FormSelect
@@ -120,7 +95,7 @@ export default function DoctorProfessional({ doctor, userId, onSaved }: DoctorPr
         hint="Patients read this on the doctors list."
       />
 
-      <EditActions isSaving={editor.isSaving} onCancel={editor.closeEditor} />
+      <SaveButton isSaving={form.isSaving} savedOk={form.savedOk} />
     </form>
   );
 }

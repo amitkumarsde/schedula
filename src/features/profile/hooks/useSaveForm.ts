@@ -2,21 +2,21 @@
 
 import { useState } from "react";
 
-// Holds the edit and save state shared by every profile tab.
-export function useEditableSection(onSaved: () => void) {
-  const [isEditing, setIsEditing] = useState(false);
+// Holds the saving state for one profile form on the edit page.
+export function useSaveForm() {
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [savedOk, setSavedOk] = useState(false);
 
-  // Runs a save action and shows the error or closes the editor.
+  // Runs a save action and shows the error or a "Saved" message.
   async function runSave(action: () => Promise<void>) {
     setErrorMessage("");
+    setSavedOk(false);
     setIsSaving(true);
 
     try {
       await action();
-      onSaved();
-      setIsEditing(false);
+      setSavedOk(true);
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Could not save");
     } finally {
@@ -24,12 +24,5 @@ export function useEditableSection(onSaved: () => void) {
     }
   }
 
-  return {
-    isEditing,
-    isSaving,
-    errorMessage,
-    openEditor: () => setIsEditing(true),
-    closeEditor: () => setIsEditing(false),
-    runSave,
-  };
+  return { isSaving, errorMessage, savedOk, runSave };
 }

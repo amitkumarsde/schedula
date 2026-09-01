@@ -1,9 +1,9 @@
 import { NextRequest } from "next/server";
 import { connectToDatabase } from "@/lib/db";
-import { sendSuccess, sendError, handleApiError } from "@/lib/utils/apiResponse";
+import { sendSuccess, sendError, handleApiError, isDuplicateKeyError } from "@/lib/utils/apiResponse";
 import { readJsonBody, isNonEmptyText, readOptionalText } from "@/lib/utils/apiRequest";
-import { makeSlots, weekdayName } from "@/lib/utils/schedule";
-import { VISIT_TYPES, MEET_TYPES } from "@/lib/utils/appointmentOptions";
+import { makeSlots, weekdayName, appointmentHasStarted } from "@/lib/utils/schedule";
+import { VISIT_TYPES, MEET_TYPES, CONSULT_TYPES } from "@/lib/utils/appointmentOptions";
 import User from "@/lib/models/User";
 import Doctor from "@/lib/models/Doctor";
 import Patient from "@/lib/models/Patient";
@@ -30,6 +30,12 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// The next number comes from the highest one so far, because a count breaks after a delete.
+async function nextAppointmentNumber() {
+  const last = await Appointment.findOne().sort({ appointmentNumber: -1 }).select("appointmentNumber");
+  return (last?.appointmentNumber ?? 0) + 1;
+}
+
 // Books one appointment for a patient.
 export async function POST(request: NextRequest) {
   try {
@@ -40,6 +46,7 @@ export async function POST(request: NextRequest) {
     const problem = readOptionalText(body.problem);
     const visitType = readOptionalText(body.visitType);
     const meetType = readOptionalText(body.meetType);
+    const consultType = readOptionalText(body.consultType);
 
     if (!isNonEmptyText(patientUserId) || !isNonEmptyText(doctorId)) {
       return sendError("patientUserId and doctorId are required");
@@ -50,6 +57,7 @@ export async function POST(request: NextRequest) {
 
     if (!VISIT_TYPES.includes(visitType)) return sendError("Please select a visit type");
     if (!MEET_TYPES.includes(meetType)) return sendError("Please select a meet type");
+    if (!CONSULT_TYPES.includes(consultType)) return sendError("Please select a consult type");
 
     await connectToDatabase();
 
@@ -66,13 +74,31 @@ export async function POST(request: NextRequest) {
       return sendError("The doctor is not available on this day");
     }
 
+    // The doctor must allow each chosen option.
+    if (!doctor.visitTypes.includes(visitType)) {
+      return sendError("This doctor does not offer that visit type");
+    }
+    if (!doctor.meetTypes.includes(meetType)) {
+      return sendError("This doctor does not offer that meet type");
+    }
+    if (!doctor.consultTypes.includes(consultType)) {
+      return sendError("This doctor does not offer that consult type");
+    }
+
     // The chosen slot must be a real slot from the doctor's timings.
-    const allSlots = [
-      ...makeSlots(doctor.morningStartTime, doctor.morningEndTime, doctor.slotDurationMinutes),
-      ...makeSlots(doctor.eveningStartTime, doctor.eveningEndTime, doctor.slotDurationMinutes),
-    ];
+    const allSlots = makeSlots(
+      doctor.startTime,
+      doctor.endTime,
+      doctor.slotDuration,
+      doctor.breakDuration
+    );
     if (!allSlots.includes(slotTime)) {
       return sendError("This time slot is not available");
+    }
+
+    // A slot in the past cannot be booked.
+    if (appointmentHasStarted(appointmentDate, slotTime)) {
+      return sendError("That time has already passed, please pick a later slot");
     }
 
     // The slot must still be free.
@@ -87,10 +113,7 @@ export async function POST(request: NextRequest) {
     const patientProfile = await Patient.findOne({ userId: patientUserId });
     const patientName = patientProfile?.fullName || patientUser.fullName;
 
-    const total = await Appointment.countDocuments();
-
-    const appointment = await Appointment.create({
-      appointmentNumber: total + 1,
+    const details = {
       doctorUserId: doctor.userId,
       patientUserId,
       doctorName: doctor.fullName,
@@ -102,9 +125,25 @@ export async function POST(request: NextRequest) {
       problem,
       visitType,
       meetType,
-    });
+      consultType,
+    };
 
-    return sendSuccess({ message: "Appointment booked", appointment }, 201);
+    // Two bookings can pick the same number at once, so try again with a fresh one.
+    for (let attempt = 0; attempt < 5; attempt++) {
+      try {
+        const appointment = await Appointment.create({
+          appointmentNumber: await nextAppointmentNumber(),
+          ...details,
+        });
+        return sendSuccess({ message: "Appointment booked", appointment }, 201);
+      } catch (error) {
+        if (isDuplicateKeyError(error, "appointmentNumber") && attempt < 4) continue;
+        throw error;
+      }
+    }
+
+    // Reached only if every retry clashed, which is very unlikely.
+    return sendError("Could not book the appointment, please try again");
   } catch (error) {
     return handleApiError(error);
   }

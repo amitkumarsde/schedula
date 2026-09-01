@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, MapPin, Building2, Award, Star, Users, MessageSquare } from "lucide-react";
+import { ArrowLeft, MapPin, Building2, Award, Star, Users, MessageSquare, Clock, Timer } from "lucide-react";
 import Alert from "@/components/ui/Alert";
 import Button from "@/components/ui/Button";
 import Avatar from "@/components/ui/Avatar";
@@ -14,7 +14,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4 border-b border-line py-3 last:border-b-0">
       <span className="text-sm text-muted">{label}</span>
-      <span className="text-sm font-medium text-ink">{value || "Not added"}</span>
+      <span className="text-sm font-medium text-ink">{value || "N/A"}</span>
     </div>
   );
 }
@@ -41,9 +41,9 @@ export default function DoctorProfileView({ doctorId }: { doctorId: string }) {
   }
 
   const tiles = [
-    { Icon: Users, value: `${doctor.totalPatients}+`, label: "Patients" },
     { Icon: Award, value: `${doctor.experienceYears} yrs`, label: "Experience" },
     { Icon: Star, value: doctor.rating, label: "Rating" },
+    { Icon: Users, value: `${doctor.totalPatients}+`, label: "Patients" },
     { Icon: MessageSquare, value: doctor.totalReviews, label: "Reviews" },
   ];
 
@@ -92,7 +92,7 @@ export default function DoctorProfileView({ doctorId }: { doctorId: string }) {
         <div className="space-y-8 lg:col-span-2">
           <section>
             <h2 className="font-bold text-ink">About doctor</h2>
-            <p className="mt-2 text-sm leading-relaxed text-muted">{doctor.about || "Not added"}</p>
+            <p className="mt-2 text-sm leading-relaxed text-muted">{doctor.about || "N/A"}</p>
           </section>
 
           <section>
@@ -107,6 +107,20 @@ export default function DoctorProfileView({ doctorId }: { doctorId: string }) {
 
         {/* The booking box. Only a patient sees the book button. */}
         <aside className="h-fit rounded-2xl border border-line bg-card p-6">
+          {/* Consulting time and slot length, shown above the fee. */}
+          {doctor.startTime && doctor.endTime && (
+            <div className="mb-5 space-y-2 border-b border-line pb-5">
+              <div className="flex items-center gap-2 text-sm font-medium text-ink">
+                <Clock className="h-4 w-4 text-brand" />
+                {doctor.startTime} - {doctor.endTime}
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted">
+                <Timer className="h-4 w-4 text-brand" />
+                {doctor.slotDuration} min per slot
+              </div>
+            </div>
+          )}
+
           <p className="text-sm text-muted">Consultation fee</p>
           <p className="mt-1 text-2xl font-bold text-ink">Rs {doctor.consultationFee}</p>
 

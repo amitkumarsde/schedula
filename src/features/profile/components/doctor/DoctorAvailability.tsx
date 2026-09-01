@@ -4,32 +4,34 @@ import { useState } from "react";
 import FormInput from "@/components/ui/FormInput";
 import FormSelect from "@/components/ui/FormSelect";
 import Alert from "@/components/ui/Alert";
-import ProfileField from "@/features/profile/components/ProfileField";
-import EditableCard from "@/features/profile/components/EditableCard";
-import EditActions from "@/features/profile/components/EditActions";
-import { useEditableSection } from "@/features/profile/hooks/useEditableSection";
+import ChipToggleGroup from "@/components/ui/ChipToggleGroup";
+import SaveButton from "@/features/profile/components/SaveButton";
+import { useSaveForm } from "@/features/profile/hooks/useSaveForm";
 import { saveDoctorProfileSection } from "@/features/profile/api/doctorProfileService";
-import { WEEK_DAYS, SLOT_DURATIONS } from "@/lib/utils/profileOptions";
+import { WEEK_DAYS, SLOT_DURATIONS, BREAK_DURATIONS } from "@/lib/utils/profileOptions";
+import { VISIT_TYPES, MEET_TYPES, CONSULT_TYPES } from "@/lib/utils/appointmentOptions";
 import type { Doctor } from "@/types";
 
-type DoctorAvailabilityProps = { doctor: Doctor; userId: string; onSaved: () => void };
+type DoctorAvailabilityProps = { doctor: Doctor; userId: string };
 
-// Shows a start and end time, or empty when not set.
-function showTimeRange(start: string, end: string) {
-  return start && end ? `${start} - ${end}` : "";
+// Removes the option if it is on, or adds it if it is off.
+function toggle(list: string[], option: string) {
+  return list.includes(option) ? list.filter((one) => one !== option) : [...list, option];
 }
 
-// The doctor availability tab: days, times, slots and fee.
-export default function DoctorAvailability({ doctor, userId, onSaved }: DoctorAvailabilityProps) {
-  const editor = useEditableSection(onSaved);
+// The doctor availability form: days, times, allowed choices and fee.
+export default function DoctorAvailability({ doctor, userId }: DoctorAvailabilityProps) {
+  const form = useSaveForm();
 
   const [days, setDays] = useState<string[]>(doctor.availableDays ?? []);
+  const [visitTypes, setVisitTypes] = useState<string[]>(doctor.visitTypes ?? []);
+  const [meetTypes, setMeetTypes] = useState<string[]>(doctor.meetTypes ?? []);
+  const [consultTypes, setConsultTypes] = useState<string[]>(doctor.consultTypes ?? []);
   const [values, setValues] = useState({
-    morningStartTime: doctor.morningStartTime ?? "",
-    morningEndTime: doctor.morningEndTime ?? "",
-    eveningStartTime: doctor.eveningStartTime ?? "",
-    eveningEndTime: doctor.eveningEndTime ?? "",
-    slotDurationMinutes: String(doctor.slotDurationMinutes || 15),
+    startTime: doctor.startTime ?? "",
+    endTime: doctor.endTime ?? "",
+    slotDuration: String(doctor.slotDuration || 15),
+    breakDuration: String(doctor.breakDuration ?? 0),
     consultationFee: doctor.consultationFee ? String(doctor.consultationFee) : "",
   });
   const [isAvailable, setIsAvailable] = useState(doctor.isAvailable ?? false);
@@ -39,138 +41,112 @@ export default function DoctorAvailability({ doctor, userId, onSaved }: DoctorAv
     setValues({ ...values, [name]: value });
   }
 
-  // Adds the day if it is off, or removes it if it is already on.
-  function toggleDay(day: string) {
-    setDays(days.includes(day) ? days.filter((one) => one !== day) : [...days, day]);
-  }
-
   // Sends the form to the API when submitted.
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    editor.runSave(async () => {
+    form.runSave(async () => {
       await saveDoctorProfileSection(userId, "availability", {
         ...values,
         availableDays: days,
-        slotDurationMinutes: Number(values.slotDurationMinutes),
+        visitTypes,
+        meetTypes,
+        consultTypes,
+        slotDuration: Number(values.slotDuration),
+        breakDuration: Number(values.breakDuration),
         consultationFee: Number(values.consultationFee),
         isAvailable,
       });
     });
   }
 
-  if (!editor.isEditing) {
-    return (
-      <EditableCard title="Availability" onEdit={editor.openEditor}>
-        <div className="grid grid-cols-2 gap-5 sm:grid-cols-3">
-          <ProfileField label="Consulting days" value={doctor.availableDays.join(", ")} />
-          <ProfileField
-            label="Morning time"
-            value={showTimeRange(doctor.morningStartTime, doctor.morningEndTime)}
-          />
-          <ProfileField
-            label="Evening time"
-            value={showTimeRange(doctor.eveningStartTime, doctor.eveningEndTime)}
-          />
-          <ProfileField label="Slot length" value={`${doctor.slotDurationMinutes} min`} />
-          <ProfileField
-            label="Consultation fee"
-            value={doctor.consultationFee ? `Rs ${doctor.consultationFee}` : ""}
-          />
-          <ProfileField label="Listed for booking" value={doctor.isAvailable ? "Yes" : "No"} />
-        </div>
-      </EditableCard>
-    );
-  }
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl border border-line bg-card p-6">
-      <h3 className="font-bold text-ink">Edit availability</h3>
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <h3 className="font-bold text-ink">Availability</h3>
 
-      {editor.errorMessage && <Alert message={editor.errorMessage} />}
+      {form.errorMessage && <Alert message={form.errorMessage} />}
 
-      <div>
-        <p className="mb-1.5 text-sm font-medium text-ink">Consulting days</p>
-
-        <div className="flex flex-wrap gap-2">
-          {WEEK_DAYS.map((day) => {
-            const isOn = days.includes(day);
-
-            return (
-              <button
-                key={day}
-                type="button"
-                onClick={() => toggleDay(day)}
-                className={`cursor-pointer rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
-                  isOn
-                    ? "border-brand bg-brand text-on-brand"
-                    : "border-line bg-card text-muted hover:border-brand hover:text-brand"
-                }`}
-              >
-                {day}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <ChipToggleGroup
+        label="Consulting days"
+        options={WEEK_DAYS}
+        selected={days}
+        onToggle={(day) => setDays(toggle(days, day))}
+      />
 
       <div className="grid gap-4 sm:grid-cols-2">
         <FormInput
-          label="Morning start"
-          name="morningStartTime"
+          label="Start time"
+          name="startTime"
           type="time"
-          value={values.morningStartTime}
-          onChange={(value) => setField("morningStartTime", value)}
+          value={values.startTime}
+          onChange={(value) => setField("startTime", value)}
         />
 
         <FormInput
-          label="Morning end"
-          name="morningEndTime"
+          label="End time"
+          name="endTime"
           type="time"
-          value={values.morningEndTime}
-          onChange={(value) => setField("morningEndTime", value)}
-        />
-
-        <FormInput
-          label="Evening start"
-          name="eveningStartTime"
-          type="time"
-          value={values.eveningStartTime}
-          onChange={(value) => setField("eveningStartTime", value)}
-        />
-
-        <FormInput
-          label="Evening end"
-          name="eveningEndTime"
-          type="time"
-          value={values.eveningEndTime}
-          onChange={(value) => setField("eveningEndTime", value)}
+          value={values.endTime}
+          onChange={(value) => setField("endTime", value)}
         />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <FormSelect
           label="Slot length (minutes)"
-          name="slotDurationMinutes"
-          value={values.slotDurationMinutes}
-          onChange={(value) => setField("slotDurationMinutes", value)}
+          name="slotDuration"
+          value={values.slotDuration}
+          onChange={(value) => setField("slotDuration", value)}
           options={SLOT_DURATIONS.map((minutes) => ({
             value: String(minutes),
             label: `${minutes} min`,
           }))}
         />
 
-        <FormInput
-          label="Consultation fee (Rs)"
-          name="consultationFee"
-          type="number"
-          value={values.consultationFee}
-          onChange={(value) => setField("consultationFee", value)}
-          placeholder="Fee for one visit"
-          required
+        <FormSelect
+          label="Break between slots"
+          name="breakDuration"
+          value={values.breakDuration}
+          onChange={(value) => setField("breakDuration", value)}
+          options={BREAK_DURATIONS.map((minutes) => ({
+            value: String(minutes),
+            label: minutes === 0 ? "No break" : `${minutes} min`,
+          }))}
         />
       </div>
 
-      <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-line px-4 py-3">
+      <FormInput
+        label="Consultation fee (Rs)"
+        name="consultationFee"
+        type="number"
+        value={values.consultationFee}
+        onChange={(value) => setField("consultationFee", value)}
+        placeholder="Fee for one visit"
+        required
+      />
+
+      {/* Only the choices picked here are open to a patient on the booking page. */}
+      <ChipToggleGroup
+        label="Visit type"
+        options={VISIT_TYPES}
+        selected={visitTypes}
+        onToggle={(option) => setVisitTypes(toggle(visitTypes, option))}
+      />
+
+      <ChipToggleGroup
+        label="Meet type"
+        options={MEET_TYPES}
+        selected={meetTypes}
+        onToggle={(option) => setMeetTypes(toggle(meetTypes, option))}
+      />
+
+      <ChipToggleGroup
+        label="Consult type"
+        options={CONSULT_TYPES}
+        selected={consultTypes}
+        onToggle={(option) => setConsultTypes(toggle(consultTypes, option))}
+      />
+
+      <label className="flex cursor-pointer items-center gap-3 px-2">
         <input
           type="checkbox"
           checked={isAvailable}
@@ -180,7 +156,7 @@ export default function DoctorAvailability({ doctor, userId, onSaved }: DoctorAv
         <span className="text-sm font-medium text-ink">Show me on the doctors list for booking</span>
       </label>
 
-      <EditActions isSaving={editor.isSaving} onCancel={editor.closeEditor} />
+      <SaveButton isSaving={form.isSaving} savedOk={form.savedOk} />
     </form>
   );
 }

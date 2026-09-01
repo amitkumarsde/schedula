@@ -1,101 +1,155 @@
 [
   {
-    "_id": { "$oid": "68d0000000000000000000a1" },
+    "_id": {
+      "$oid": "68d0000000000000000000a1"
+    },
     "fullName": "Dr. Kumar Das",
-    "email": "kumar.das@arogyasathi.com",
+    "email": "kumar.das@schedula.com",
     "password": "123456",
     "role": "doctor",
     "isProfileComplete": true,
-    "createdAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "updatedAt": { "$date": "2026-08-01T06:00:00.000Z" },
+    "createdAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
     "__v": 0
   },
   {
-    "_id": { "$oid": "68d0000000000000000000a2" },
+    "_id": {
+      "$oid": "68d0000000000000000000a2"
+    },
     "fullName": "Dr. Prakash Das",
-    "email": "prakash.das@arogyasathi.com",
+    "email": "prakash.das@schedula.com",
     "password": "123456",
     "role": "doctor",
     "isProfileComplete": true,
-    "createdAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "updatedAt": { "$date": "2026-08-01T06:00:00.000Z" },
+    "createdAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
     "__v": 0
   },
   {
-    "_id": { "$oid": "68d0000000000000000000a3" },
+    "_id": {
+      "$oid": "68d0000000000000000000a3"
+    },
     "fullName": "Dr. Rajesh Menon",
-    "email": "rajesh.menon@arogyasathi.com",
+    "email": "rajesh.menon@schedula.com",
     "password": "123456",
     "role": "doctor",
     "isProfileComplete": true,
-    "createdAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "updatedAt": { "$date": "2026-08-01T06:00:00.000Z" },
+    "createdAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
     "__v": 0
   },
   {
-    "_id": { "$oid": "68d0000000000000000000a4" },
+    "_id": {
+      "$oid": "68d0000000000000000000a4"
+    },
     "fullName": "Dr. Arjun Nair",
-    "email": "arjun.nair@arogyasathi.com",
+    "email": "arjun.nair@schedula.com",
     "password": "123456",
     "role": "doctor",
     "isProfileComplete": true,
-    "createdAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "updatedAt": { "$date": "2026-08-01T06:00:00.000Z" },
+    "createdAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
     "__v": 0
   },
   {
-    "_id": { "$oid": "68d0000000000000000000a5" },
+    "_id": {
+      "$oid": "68d0000000000000000000a5"
+    },
     "fullName": "Dr. Sanjay Verma",
-    "email": "sanjay.verma@arogyasathi.com",
+    "email": "sanjay.verma@schedula.com",
     "password": "123456",
     "role": "doctor",
     "isProfileComplete": true,
-    "createdAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "updatedAt": { "$date": "2026-08-01T06:00:00.000Z" },
+    "createdAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
     "__v": 0
   },
   {
-    "_id": { "$oid": "68d0000000000000000000a6" },
+    "_id": {
+      "$oid": "68d0000000000000000000a6"
+    },
     "fullName": "Dr. Ananya Sharma",
-    "email": "ananya.sharma@arogyasathi.com",
+    "email": "ananya.sharma@schedula.com",
     "password": "123456",
     "role": "doctor",
     "isProfileComplete": true,
-    "createdAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "updatedAt": { "$date": "2026-08-01T06:00:00.000Z" },
+    "createdAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
     "__v": 0
   },
   {
-    "_id": { "$oid": "68d0000000000000000000a7" },
+    "_id": {
+      "$oid": "68d0000000000000000000a7"
+    },
     "fullName": "Dr. Meera Iyer",
-    "email": "meera.iyer@arogyasathi.com",
+    "email": "meera.iyer@schedula.com",
     "password": "123456",
     "role": "doctor",
     "isProfileComplete": true,
-    "createdAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "updatedAt": { "$date": "2026-08-01T06:00:00.000Z" },
+    "createdAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
     "__v": 0
   },
   {
-    "_id": { "$oid": "68d0000000000000000000a8" },
+    "_id": {
+      "$oid": "68d0000000000000000000a8"
+    },
     "fullName": "Dr. Priya Reddy",
-    "email": "priya.reddy@arogyasathi.com",
+    "email": "priya.reddy@schedula.com",
     "password": "123456",
     "role": "doctor",
     "isProfileComplete": true,
-    "createdAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "updatedAt": { "$date": "2026-08-01T06:00:00.000Z" },
+    "createdAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
     "__v": 0
   },
   {
-    "_id": { "$oid": "68d0000000000000000000a9" },
+    "_id": {
+      "$oid": "68d0000000000000000000a9"
+    },
     "fullName": "Dr. Kavita Joshi",
-    "email": "kavita.joshi@arogyasathi.com",
+    "email": "kavita.joshi@schedula.com",
     "password": "123456",
     "role": "doctor",
     "isProfileComplete": true,
-    "createdAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "updatedAt": { "$date": "2026-08-01T06:00:00.000Z" },
+    "createdAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
     "__v": 0
   }
 ]

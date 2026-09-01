@@ -19,6 +19,7 @@ export async function bookAppointment(payload: {
   problem: string;
   visitType: string;
   meetType: string;
+  consultType: string;
 }): Promise<Appointment> {
   const data = await apiPost("/appointments", payload);
   return data.appointment;
@@ -43,5 +44,35 @@ export async function updateAppointmentStatus(
   status: AppointmentStatus
 ): Promise<Appointment> {
   const data = await apiPatch(`/appointments/${appointmentId}`, { userId, status });
+  return data.appointment;
+}
+
+// The doctor saves the prescription for one appointment.
+export async function savePrescription(
+  appointmentId: string,
+  userId: string,
+  prescriptionDescription: string,
+  medicines: string[]
+): Promise<Appointment> {
+  const data = await apiPatch(`/appointments/${appointmentId}`, {
+    userId,
+    prescriptionDescription,
+    medicines,
+  });
+  return data.appointment;
+}
+
+// Moves one appointment to a new date and time.
+export async function rescheduleAppointment(
+  appointmentId: string,
+  userId: string,
+  appointmentDate: string,
+  slotTime: string
+): Promise<Appointment> {
+  const data = await apiPatch(`/appointments/${appointmentId}`, {
+    userId,
+    appointmentDate,
+    slotTime,
+  });
   return data.appointment;
 }

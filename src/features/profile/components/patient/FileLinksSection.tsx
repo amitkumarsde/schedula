@@ -1,34 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { ExternalLink, Trash2, Plus } from "lucide-react";
+import { Trash2, Plus } from "lucide-react";
 import FormInput from "@/components/ui/FormInput";
 import Alert from "@/components/ui/Alert";
-import EditableCard from "@/features/profile/components/EditableCard";
-import EditActions from "@/features/profile/components/EditActions";
-import { useEditableSection } from "@/features/profile/hooks/useEditableSection";
+import SaveButton from "@/features/profile/components/SaveButton";
+import { useSaveForm } from "@/features/profile/hooks/useSaveForm";
 import { savePatientProfileSection } from "@/features/profile/api/patientProfileService";
 import type { FileLink } from "@/types";
 
 type FileLinksSectionProps = {
   title: string;
-  emptyText: string;
   links: FileLink[];
   userId: string;
   section: "documents" | "reports";
-  onSaved: () => void;
 };
 
 // A file is saved as a link, because the project has no file storage yet.
-export default function FileLinksSection({
-  title,
-  emptyText,
-  links,
-  userId,
-  section,
-  onSaved,
-}: FileLinksSectionProps) {
-  const editor = useEditableSection(onSaved);
+export default function FileLinksSection({ title, links, userId, section }: FileLinksSectionProps) {
+  const form = useSaveForm();
   const [draftLinks, setDraftLinks] = useState<FileLink[]>(links);
   const [newName, setNewName] = useState("");
   const [newUrl, setNewUrl] = useState("");
@@ -59,47 +49,16 @@ export default function FileLinksSection({
   // Sends the form to the API when submitted.
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    editor.runSave(async () => {
+    form.runSave(async () => {
       await savePatientProfileSection(userId, section, { links: draftLinks });
     });
   }
 
-  if (!editor.isEditing) {
-    return (
-      <EditableCard title={title} onEdit={editor.openEditor}>
-        {links.length === 0 ? (
-          <p className="text-sm text-muted">{emptyText}</p>
-        ) : (
-          <ul className="space-y-2">
-            {links.map((link, index) => (
-              <li
-                key={index}
-                className="flex items-center justify-between gap-3 rounded-xl border border-line px-4 py-3"
-              >
-                <span className="truncate text-sm font-medium text-ink">{link.name}</span>
-
-                <a
-                  href={link.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex shrink-0 items-center gap-1.5 text-sm font-medium text-brand hover:underline"
-                >
-                  Open
-                  <ExternalLink className="h-4 w-4" />
-                </a>
-              </li>
-            ))}
-          </ul>
-        )}
-      </EditableCard>
-    );
-  }
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-line bg-card p-6">
-      <h3 className="font-bold text-ink">Edit {title.toLowerCase()}</h3>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <h3 className="font-bold text-ink">{title}</h3>
 
-      {editor.errorMessage && <Alert message={editor.errorMessage} />}
+      {form.errorMessage && <Alert message={form.errorMessage} />}
 
       {draftLinks.length === 0 ? (
         <p className="text-sm text-muted">No links yet. Add one below.</p>
@@ -157,7 +116,7 @@ export default function FileLinksSection({
       </div>
 
       <div className="border-t border-line pt-4">
-        <EditActions isSaving={editor.isSaving} onCancel={editor.closeEditor} />
+        <SaveButton isSaving={form.isSaving} savedOk={form.savedOk} />
       </div>
     </form>
   );

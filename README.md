@@ -1,8 +1,8 @@
 # Schedula
 
-A doctor appointment app. A person can create an account, log in, fill their profile, browse doctors, and a patient can book an appointment with a doctor.
+A doctor appointment app. A person can make an account, log in, fill their profile, look for doctors, and book an appointment.
 
-> New here? Read **[patient.md](patient.md)** for the patient story (signup to booking) and **[doctor.md](doctor.md)** for the doctor story (signup to getting appointments). Both list the exact files each role uses.
+> New here? Read **[patient.md](patient.md)** for the patient story and **[doctor.md](doctor.md)** for the doctor story. Both list the files each role uses.
 
 ---
 
@@ -10,13 +10,18 @@ A doctor appointment app. A person can create an account, log in, fill their pro
 
 - Sign up as a **patient** or a **doctor** with full name, email and password
 - Log in with email and password
-- Home page with a search box, top rated doctors and a short "how it works" section
-- Doctors page with all available doctors
-- Search a doctor by name, specialization or city
-- Filter doctors by specialization
-- **Profile page** with tabs. A patient fills basic info, medical history, documents and test reports. A doctor fills basic info, professional details and availability (days, times, fee)
-- **Booking** for a patient: pick a doctor, pick a date on a calendar, pick a slot, choose visit type and meet type, add the problem, and confirm
-- **Appointments page** for both roles, with Upcoming, Completed and Cancelled tabs, and a detail page where a patient can cancel and a doctor can complete or cancel
+- Home page with a search box, top rated doctors and a short "how it works" part
+- Doctors page with all the doctors who are open for booking
+- Search a doctor by name, specialization or city, or tap a specialization chip
+- **Profile page** with tabs, and a separate **edit page** where each part saves on its own
+  - A patient fills basic info, medical history, documents and test reports
+  - A doctor fills basic info, professional details and availability
+- **Booking** for a patient: pick a doctor, pick a date, pick a free slot, choose visit type and meet type, write the problem, and confirm. Slots that are taken or already gone are greyed out
+- **Appointments page** for both roles with Upcoming, Completed and Cancelled tabs
+- **Appointment detail page** showing the doctor, the patient and the appointment. A patient can cancel
+- **Prescription**: after the visit time the doctor writes a note and a medicine list, then marks the visit completed. The patient can read it
+- **Doctor dashboard** with the day's numbers and a calendar. The doctor drags an appointment to a free slot to move it
+- **Notifications** with a bell in the header. The other person is told when an appointment is moved or cancelled
 
 ---
 
@@ -30,7 +35,7 @@ A doctor appointment app. A person can create an account, log in, fill their pro
 | Backend | Next.js API routes |
 | Database | MongoDB |
 
-The pages and the API live in the same Next.js project, so there is no separate backend server to start.
+The pages and the API live in the same Next.js project, so there is no second server to start.
 
 ---
 
@@ -44,7 +49,7 @@ The pages and the API live in the same Next.js project, so there is no separate 
 npm install
 ```
 
-**3. Create a file named `.env` in the project root**
+**3. Make a file named `.env` in the project root**
 
 ```
 MONGODB_URI=your_mongodb_connection_string_here
@@ -54,10 +59,12 @@ MONGODB_URI=your_mongodb_connection_string_here
 
 Open MongoDB Atlas, go to **Browse Collections**, then:
 
-- insert everything from `seed/users.json` into a `users` collection
-- insert everything from `seed/doctors.json` into a `doctors` collection
+- put everything from `seed/users.json` into a `users` collection
+- put everything from `seed/doctors.json` into a `doctors` collection
 
-Insert `users.json` **first**, because every doctor row points to a user row through `userId`.
+Add `users.json` **first**, because every doctor row points to a user row through `userId`.
+
+All sample doctors use the password `123456`.
 
 ---
 
@@ -70,6 +77,7 @@ npm run dev
 Open <http://localhost:3000>.
 
 To make the production build:
+
 ```bash
 npm run build
 ```
@@ -81,10 +89,9 @@ npm run build
 ```
 schedula/
 ├── README.md                   This file
-├── TASK.md                     Daily work log
 ├── patient.md                  The patient story and the patient files
 ├── doctor.md                   The doctor story and the doctor files
-├── seed/                       Sample data to insert into MongoDB
+├── seed/                       Sample data for MongoDB
 │   ├── users.json
 │   └── doctors.json
 └── src/
@@ -93,28 +100,33 @@ schedula/
     │   │   ├── auth/           signup, login
     │   │   ├── doctors/        list, one doctor, free slots
     │   │   ├── appointments/   list, book, one appointment
+    │   │   ├── notifications/  read and mark as read
     │   │   └── profile/        patient profile, doctor profile
-    │   ├── login/              Login pages
-        ├── signup/             Signup pages
+    │   ├── login/              Login page
+    │   ├── signup/             Signup page
     │   ├── doctors/            Doctors list, one doctor, booking page
     │   ├── appointments/       My appointments, one appointment
-    │   ├── profile/            Redirect by role, patient profile, doctor profile
+    │   ├── dashboard/          Doctor dashboard
+    │   ├── notifications/      Notifications page
+    │   ├── profile/            Redirect by role, and profile + edit pages
     │   ├── layout.tsx          Header and footer on every page
     │   └── page.tsx            Home page
-    ├── features/               
+    ├── features/
     │   ├── auth/               Login and signup forms + API calls
     │   ├── doctors/            Doctor cards, list, public profile page
-    │   ├── appointments/       Booking flow, calendar, slots, lists
+    │   ├── appointments/       Booking flow, calendars, slots, lists
+    │   ├── dashboard/          Doctor dashboard
+    │   ├── notifications/      Bell and notifications page
     │   ├── profile/            Patient and doctor profile
-    │   └── home/               Home page sections
+    │   └── home/               Home page parts
     ├── components/
     │   ├── ui/                 Buttons, inputs, avatar, etc
-    │   └── layout/             Header, footer
+    │   └── layout/             Header, footer, background circles
     ├── lib/
     │   ├── api/                One fetch helper for the whole app
     │   ├── auth/               Keeps the logged in user
     │   ├── models/             Mongoose schemas
-    │   ├── profile/            Server side checks for the profile tabs
+    │   ├── profile/            Server side checks for the profile parts
     │   ├── utils/              Small helpers
     │   └── db.ts               Database connection
     └── types/                  Shared TypeScript types
@@ -145,21 +157,30 @@ Every reply has the same shape:
 
 | Method | URL | What it does |
 |---|---|---|
-| POST | `/api/auth/signup` | Create an account. Needs `fullName`, `email`, `password`, `role`. Also makes an empty profile |
+| POST | `/api/auth/signup` | Make an account. Needs `fullName`, `email`, `password`, `role`. Also makes an empty profile |
 | POST | `/api/auth/login` | Check the email and password, returns the user |
 | GET | `/api/doctors` | The doctors list. `?search=` and `?specialization=` are optional |
 | GET | `/api/doctors/[id]` | One doctor's full profile |
-| GET | `/api/doctors/[id]/slots?date=` | The free and taken time slots for that day |
+| GET | `/api/doctors/[id]/slots?date=` | The slots for that day, each marked free, taken or past |
 | GET | `/api/profile/patient?userId=` | The patient's saved profile |
-| PUT | `/api/profile/patient` | Save one tab of the patient profile |
+| PUT | `/api/profile/patient` | Save one part of the patient profile |
 | GET | `/api/profile/doctor?userId=` | The doctor's saved profile |
-| PUT | `/api/profile/doctor` | Save one tab of the doctor profile |
+| PUT | `/api/profile/doctor` | Save one part of the doctor profile |
 | GET | `/api/appointments?userId=` | My appointments (patient or doctor, based on the role) |
 | POST | `/api/appointments` | Book one appointment (patient only) |
 | GET | `/api/appointments/[id]?userId=` | One appointment, only for the people on it |
-| PATCH | `/api/appointments/[id]` | Cancel or complete one appointment |
+| PATCH | `/api/appointments/[id]` | Move it, save a prescription, cancel it or complete it |
+| GET | `/api/notifications?userId=` | My notifications and how many are unread |
+| PATCH | `/api/notifications` | Mark all my notifications as read |
 
-The profile and appointment APIs need a `userId` so the server knows whose data to read or save.
+The profile, appointment and notification APIs need a `userId` so the server knows whose data to read or save.
+
+**What `PATCH /api/appointments/[id]` does** depends on what you send:
+
+- send `appointmentDate` and `slotTime` → move the appointment (doctor only)
+- send `status` as `cancelled` → cancel it (both roles), and the other person gets a notification
+- send `status` as `completed` → finish it (doctor only, after the visit time, and a prescription note is needed)
+- send `prescriptionDescription` and `medicines` → save the prescription (doctor only, after the visit time)
 
 ---
 
@@ -173,19 +194,29 @@ The profile and appointment APIs need a `userId` so the server knows whose data 
 | email | Login email, saved in small letters, cannot repeat |
 | password | Plain text for now, see the notes at the end |
 | role | `patient` or `doctor` |
-| isProfileComplete | Turns `true` when the profile "Basic info" tab is saved |
+| isProfileComplete | Turns `true` when the "Basic info" part is saved |
 
 **doctors** — the doctor profile
 
-Name, gender, photo, mobile number, specialization, qualification, experience, city, hospital, fee, rating, total patients and reviews. It also has the consulting **days**, **morning and evening times**, **slot length** and an `isAvailable` switch. A new doctor starts with `isAvailable: false`, and only doctors with `isAvailable: true` (and a specialization) appear in the doctors list.
+Name, gender, photo, mobile number, specialization, qualification, experience, city, hospital, fee, rating, total patients and reviews. It also has the consulting **days**, a **start and end time**, the **slot length**, the **break** between two slots, and an `isAvailable` switch. It also keeps a **notifications** list.
+
+A new doctor starts with `isAvailable: false`. Only doctors with `isAvailable: true` and a specialization show up in the doctors list.
 
 **patients** — the patient profile
 
-Name, age, gender, photo, mobile number, weight, blood group, city, **allergies** and **diseases** (saved as lists), and **documents** and **testReports** (saved as `{ name, link }` items).
+Name, age, gender, photo, mobile number, weight, height, blood group, city, **allergies** and **diseases** (saved as lists), and **documents** and **testReports** (saved as `{ name, link }` items). It also keeps a **notifications** list.
 
 **appointments** — one booking
 
-Appointment number, the patient and doctor ids, a copy of the doctor name, specialization and fee, the patient name, the date and slot time, the problem, the visit type, the meet type, and a status of `upcoming`, `completed` or `cancelled`.
+Appointment number, the patient and doctor ids, a copy of the doctor name, specialization and fee, the patient name, the date and slot time, the problem, the visit type, the meet type, the **prescription note** and **medicine list**, and a status of `upcoming`, `completed` or `cancelled`.
+
+---
+
+## How the time slots are made
+
+A doctor sets a **start time**, an **end time**, a **slot length** and a **break**. The app then makes the slots one after another:
+
+The same helper (`makeSlots` in `src/lib/utils/schedule.ts`) is used by the booking page, the slots API and the dashboard, so every screen shows the same times.
 
 ---
 

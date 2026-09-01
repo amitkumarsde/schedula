@@ -14,6 +14,9 @@ export type Appointment = {
   problem: string;
   visitType: string;
   meetType: string;
+  consultType: string;
+  prescriptionDescription: string;
+  medicines: string[];
   status: AppointmentStatus;
   createdAt: string;
 };
@@ -21,4 +24,5 @@ export type Appointment = {
 export type Slot = {
   time: string;
   taken: boolean;
+  past: boolean;
 };

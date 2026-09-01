@@ -1,7 +1,11 @@
 [
   {
-    "_id": { "$oid": "68d0000000000000000000b1" },
-    "userId": { "$oid": "68d0000000000000000000a1" },
+    "_id": {
+      "$oid": "68d0000000000000000000b1"
+    },
+    "userId": {
+      "$oid": "68d0000000000000000000a1"
+    },
     "fullName": "Dr. Kumar Das",
     "gender": "male",
     "profileImage": "https://png.pngtree.com/png-clipart/20250109/original/pngtree-3d-male-doctor-icon-png-image_19123264.png",
@@ -16,20 +20,47 @@
     "rating": 4.8,
     "totalPatients": 5000,
     "totalReviews": 4942,
-    "availableDays": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-    "morningStartTime": "09:30",
-    "morningEndTime": "13:00",
-    "eveningStartTime": "17:00",
-    "eveningEndTime": "19:00",
-    "slotDurationMinutes": 15,
+    "availableDays": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday"
+    ],
     "isAvailable": true,
-    "createdAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "updatedAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "__v": 0
+    "createdAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "__v": 0,
+    "startTime": "09:30",
+    "endTime": "19:00",
+    "slotDuration": 15,
+    "breakDuration": 0,
+    "visitTypes": [
+      "First visit",
+      "Follow-up",
+      "Routine"
+    ],
+    "meetTypes": [
+      "In clinic",
+      "Video call",
+      "Phone call"
+    ],
+    "consultTypes": [
+      "Individual",
+      "Group"
+    ]
   },
   {
-    "_id": { "$oid": "68d0000000000000000000b2" },
-    "userId": { "$oid": "68d0000000000000000000a2" },
+    "_id": {
+      "$oid": "68d0000000000000000000b2"
+    },
+    "userId": {
+      "$oid": "68d0000000000000000000a2"
+    },
     "fullName": "Dr. Prakash Das",
     "gender": "male",
     "profileImage": "https://png.pngtree.com/png-clipart/20250109/original/pngtree-3d-male-doctor-icon-png-image_19123264.png",
@@ -44,20 +75,48 @@
     "rating": 4.6,
     "totalPatients": 2200,
     "totalReviews": 1810,
-    "availableDays": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-    "morningStartTime": "09:30",
-    "morningEndTime": "13:30",
-    "eveningStartTime": "16:00",
-    "eveningEndTime": "19:00",
-    "slotDurationMinutes": 30,
+    "availableDays": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ],
     "isAvailable": true,
-    "createdAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "updatedAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "__v": 0
+    "createdAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "__v": 0,
+    "startTime": "09:30",
+    "endTime": "19:00",
+    "slotDuration": 30,
+    "breakDuration": 0,
+    "visitTypes": [
+      "First visit",
+      "Follow-up",
+      "Routine"
+    ],
+    "meetTypes": [
+      "In clinic",
+      "Video call",
+      "Phone call"
+    ],
+    "consultTypes": [
+      "Individual",
+      "Group"
+    ]
   },
   {
-    "_id": { "$oid": "68d0000000000000000000b3" },
-    "userId": { "$oid": "68d0000000000000000000a3" },
+    "_id": {
+      "$oid": "68d0000000000000000000b3"
+    },
+    "userId": {
+      "$oid": "68d0000000000000000000a3"
+    },
     "fullName": "Dr. Rajesh Menon",
     "gender": "male",
     "profileImage": "https://png.pngtree.com/png-clipart/20250109/original/pngtree-3d-male-doctor-icon-png-image_19123264.png",
@@ -72,20 +131,45 @@
     "rating": 4.7,
     "totalPatients": 3800,
     "totalReviews": 2950,
-    "availableDays": ["Monday", "Wednesday", "Friday"],
-    "morningStartTime": "10:00",
-    "morningEndTime": "13:00",
-    "eveningStartTime": "18:00",
-    "eveningEndTime": "20:00",
-    "slotDurationMinutes": 20,
+    "availableDays": [
+      "Monday",
+      "Wednesday",
+      "Friday"
+    ],
     "isAvailable": true,
-    "createdAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "updatedAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "__v": 0
+    "createdAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "__v": 0,
+    "startTime": "10:00",
+    "endTime": "20:00",
+    "slotDuration": 20,
+    "breakDuration": 0,
+    "visitTypes": [
+      "First visit",
+      "Follow-up",
+      "Routine"
+    ],
+    "meetTypes": [
+      "In clinic",
+      "Video call",
+      "Phone call"
+    ],
+    "consultTypes": [
+      "Individual",
+      "Group"
+    ]
   },
   {
-    "_id": { "$oid": "68d0000000000000000000b4" },
-    "userId": { "$oid": "68d0000000000000000000a4" },
+    "_id": {
+      "$oid": "68d0000000000000000000b4"
+    },
+    "userId": {
+      "$oid": "68d0000000000000000000a4"
+    },
     "fullName": "Dr. Arjun Nair",
     "gender": "male",
     "profileImage": "https://png.pngtree.com/png-clipart/20250109/original/pngtree-3d-male-doctor-icon-png-image_19123264.png",
@@ -100,20 +184,45 @@
     "rating": 4.5,
     "totalPatients": 1900,
     "totalReviews": 1420,
-    "availableDays": ["Tuesday", "Thursday", "Saturday"],
-    "morningStartTime": "11:00",
-    "morningEndTime": "14:00",
-    "eveningStartTime": "17:30",
-    "eveningEndTime": "20:30",
-    "slotDurationMinutes": 15,
+    "availableDays": [
+      "Tuesday",
+      "Thursday",
+      "Saturday"
+    ],
     "isAvailable": true,
-    "createdAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "updatedAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "__v": 0
+    "createdAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "__v": 0,
+    "startTime": "11:00",
+    "endTime": "20:30",
+    "slotDuration": 15,
+    "breakDuration": 0,
+    "visitTypes": [
+      "First visit",
+      "Follow-up",
+      "Routine"
+    ],
+    "meetTypes": [
+      "In clinic",
+      "Video call",
+      "Phone call"
+    ],
+    "consultTypes": [
+      "Individual",
+      "Group"
+    ]
   },
   {
-    "_id": { "$oid": "68d0000000000000000000b5" },
-    "userId": { "$oid": "68d0000000000000000000a5" },
+    "_id": {
+      "$oid": "68d0000000000000000000b5"
+    },
+    "userId": {
+      "$oid": "68d0000000000000000000a5"
+    },
     "fullName": "Dr. Sanjay Verma",
     "gender": "male",
     "profileImage": "https://png.pngtree.com/png-clipart/20250109/original/pngtree-3d-male-doctor-icon-png-image_19123264.png",
@@ -128,20 +237,47 @@
     "rating": 4.9,
     "totalPatients": 6100,
     "totalReviews": 5300,
-    "availableDays": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-    "morningStartTime": "09:00",
-    "morningEndTime": "12:00",
-    "eveningStartTime": "16:30",
-    "eveningEndTime": "19:30",
-    "slotDurationMinutes": 30,
+    "availableDays": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday"
+    ],
     "isAvailable": true,
-    "createdAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "updatedAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "__v": 0
+    "createdAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "__v": 0,
+    "startTime": "09:00",
+    "endTime": "19:30",
+    "slotDuration": 30,
+    "breakDuration": 0,
+    "visitTypes": [
+      "First visit",
+      "Follow-up",
+      "Routine"
+    ],
+    "meetTypes": [
+      "In clinic",
+      "Video call",
+      "Phone call"
+    ],
+    "consultTypes": [
+      "Individual",
+      "Group"
+    ]
   },
   {
-    "_id": { "$oid": "68d0000000000000000000b6" },
-    "userId": { "$oid": "68d0000000000000000000a6" },
+    "_id": {
+      "$oid": "68d0000000000000000000b6"
+    },
+    "userId": {
+      "$oid": "68d0000000000000000000a6"
+    },
     "fullName": "Dr. Ananya Sharma",
     "gender": "female",
     "profileImage": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDaZxl38Z5nXdYSDGh1zv1p9DTneaY1rp7fR7mpBx26g&s=10",
@@ -156,20 +292,48 @@
     "rating": 4.8,
     "totalPatients": 4300,
     "totalReviews": 3600,
-    "availableDays": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-    "morningStartTime": "10:00",
-    "morningEndTime": "13:00",
-    "eveningStartTime": "17:00",
-    "eveningEndTime": "20:00",
-    "slotDurationMinutes": 15,
+    "availableDays": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ],
     "isAvailable": true,
-    "createdAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "updatedAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "__v": 0
+    "createdAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "__v": 0,
+    "startTime": "10:00",
+    "endTime": "20:00",
+    "slotDuration": 15,
+    "breakDuration": 0,
+    "visitTypes": [
+      "First visit",
+      "Follow-up",
+      "Routine"
+    ],
+    "meetTypes": [
+      "In clinic",
+      "Video call",
+      "Phone call"
+    ],
+    "consultTypes": [
+      "Individual",
+      "Group"
+    ]
   },
   {
-    "_id": { "$oid": "68d0000000000000000000b7" },
-    "userId": { "$oid": "68d0000000000000000000a7" },
+    "_id": {
+      "$oid": "68d0000000000000000000b7"
+    },
+    "userId": {
+      "$oid": "68d0000000000000000000a7"
+    },
     "fullName": "Dr. Meera Iyer",
     "gender": "female",
     "profileImage": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDaZxl38Z5nXdYSDGh1zv1p9DTneaY1rp7fR7mpBx26g&s=10",
@@ -184,20 +348,47 @@
     "rating": 4.7,
     "totalPatients": 3100,
     "totalReviews": 2480,
-    "availableDays": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-    "morningStartTime": "09:30",
-    "morningEndTime": "12:30",
-    "eveningStartTime": "17:00",
-    "eveningEndTime": "19:00",
-    "slotDurationMinutes": 15,
+    "availableDays": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday"
+    ],
     "isAvailable": true,
-    "createdAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "updatedAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "__v": 0
+    "createdAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "__v": 0,
+    "startTime": "09:30",
+    "endTime": "19:00",
+    "slotDuration": 15,
+    "breakDuration": 0,
+    "visitTypes": [
+      "First visit",
+      "Follow-up",
+      "Routine"
+    ],
+    "meetTypes": [
+      "In clinic",
+      "Video call",
+      "Phone call"
+    ],
+    "consultTypes": [
+      "Individual",
+      "Group"
+    ]
   },
   {
-    "_id": { "$oid": "68d0000000000000000000b8" },
-    "userId": { "$oid": "68d0000000000000000000a8" },
+    "_id": {
+      "$oid": "68d0000000000000000000b8"
+    },
+    "userId": {
+      "$oid": "68d0000000000000000000a8"
+    },
     "fullName": "Dr. Priya Reddy",
     "gender": "female",
     "profileImage": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDaZxl38Z5nXdYSDGh1zv1p9DTneaY1rp7fR7mpBx26g&s=10",
@@ -212,20 +403,46 @@
     "rating": 4.4,
     "totalPatients": 2600,
     "totalReviews": 1980,
-    "availableDays": ["Tuesday", "Wednesday", "Thursday", "Saturday"],
-    "morningStartTime": "10:30",
-    "morningEndTime": "13:30",
-    "eveningStartTime": "18:00",
-    "eveningEndTime": "20:00",
-    "slotDurationMinutes": 20,
+    "availableDays": [
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Saturday"
+    ],
     "isAvailable": true,
-    "createdAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "updatedAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "__v": 0
+    "createdAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "__v": 0,
+    "startTime": "10:30",
+    "endTime": "20:00",
+    "slotDuration": 20,
+    "breakDuration": 0,
+    "visitTypes": [
+      "First visit",
+      "Follow-up",
+      "Routine"
+    ],
+    "meetTypes": [
+      "In clinic",
+      "Video call",
+      "Phone call"
+    ],
+    "consultTypes": [
+      "Individual",
+      "Group"
+    ]
   },
   {
-    "_id": { "$oid": "68d0000000000000000000b9" },
-    "userId": { "$oid": "68d0000000000000000000a9" },
+    "_id": {
+      "$oid": "68d0000000000000000000b9"
+    },
+    "userId": {
+      "$oid": "68d0000000000000000000a9"
+    },
     "fullName": "Dr. Kavita Joshi",
     "gender": "female",
     "profileImage": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDaZxl38Z5nXdYSDGh1zv1p9DTneaY1rp7fR7mpBx26g&s=10",
@@ -240,15 +457,37 @@
     "rating": 4.6,
     "totalPatients": 3400,
     "totalReviews": 2700,
-    "availableDays": ["Monday", "Tuesday", "Thursday", "Friday"],
-    "morningStartTime": "09:00",
-    "morningEndTime": "12:00",
-    "eveningStartTime": "16:00",
-    "eveningEndTime": "18:30",
-    "slotDurationMinutes": 15,
+    "availableDays": [
+      "Monday",
+      "Tuesday",
+      "Thursday",
+      "Friday"
+    ],
     "isAvailable": true,
-    "createdAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "updatedAt": { "$date": "2026-08-01T06:00:00.000Z" },
-    "__v": 0
+    "createdAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-01T06:00:00.000Z"
+    },
+    "__v": 0,
+    "startTime": "09:00",
+    "endTime": "18:30",
+    "slotDuration": 15,
+    "breakDuration": 0,
+    "visitTypes": [
+      "First visit",
+      "Follow-up",
+      "Routine"
+    ],
+    "meetTypes": [
+      "In clinic",
+      "Video call",
+      "Phone call"
+    ],
+    "consultTypes": [
+      "Individual",
+      "Group"
+    ]
   }
 ]

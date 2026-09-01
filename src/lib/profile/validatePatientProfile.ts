@@ -13,6 +13,7 @@ export function validatePatientBasic(body: Record<string, unknown>): CheckResult
 
   const age = Number(body.age);
   const weight = Number(body.weight);
+  const height = Number(body.height);
 
   if (fullName.length < 3 || fullName.length > 60) {
     return fail("Full name must be between 3 and 60 characters");
@@ -35,6 +36,12 @@ export function validatePatientBasic(body: Record<string, unknown>): CheckResult
     return fail("Weight must be between 1 and 500 Kg");
   }
 
+  // Height is optional, but must be sensible when given.
+  if (Number.isFinite(height) && height > 0 && (height < 30 || height > 300)) {
+    return fail("Height must be between 30 and 300 cm");
+  }
+  const cleanHeight = Number.isFinite(height) && height > 0 ? height : 0;
+
   if (bloodGroup && !BLOOD_GROUPS.includes(bloodGroup)) {
     return fail("Please select a blood group from the list");
   }
@@ -43,7 +50,7 @@ export function validatePatientBasic(body: Record<string, unknown>): CheckResult
     return fail("Photo link must start with https://");
   }
 
-  return ok({ fullName, age, gender, mobileNumber, weight, bloodGroup, city, profileImage });
+  return ok({ fullName, age, gender, mobileNumber, weight, height: cleanHeight, bloodGroup, city, profileImage });
 }
 
 function toCleanList(value: unknown): string[] {

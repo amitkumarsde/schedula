@@ -38,7 +38,8 @@ export default function AppointmentList() {
       <h1 className="text-2xl font-bold text-ink sm:text-3xl">My appointments</h1>
       <p className="mt-1.5 text-sm text-muted">All your booked appointments in one place.</p>
 
-      <div className="no-scrollbar mt-6 flex gap-1 overflow-x-auto rounded-xl border border-line bg-surface p-1">
+      {/* Underline tabs. */}
+      <div className="no-scrollbar mt-6 flex gap-6 overflow-x-auto border-b border-line">
         {TABS.map((tab) => {
           const isActive = tab.key === activeTab;
 
@@ -47,8 +48,8 @@ export default function AppointmentList() {
               key={tab.key}
               type="button"
               onClick={() => setActiveTab(tab.key)}
-              className={`flex-1 cursor-pointer rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
-                isActive ? "bg-card text-brand shadow-sm" : "text-muted hover:text-ink"
+              className={`-mb-px shrink-0 cursor-pointer border-b-2 pb-3 text-sm font-semibold transition-colors ${
+                isActive ? "border-brand text-brand" : "border-transparent text-muted hover:text-ink"
               }`}
             >
               {tab.label}
@@ -63,7 +64,7 @@ export default function AppointmentList() {
         {!isLoading && errorMessage && <Alert message={errorMessage} />}
 
         {!isLoading && !errorMessage && shownAppointments.length === 0 && (
-          <div className="rounded-2xl border border-line bg-surface p-12 text-center">
+          <div className="rounded-2xl bg-surface p-12 text-center">
             <CalendarX className="mx-auto h-10 w-10 text-muted" />
             <p className="mt-4 font-semibold text-ink">No {activeTab} appointments</p>
 
@@ -76,7 +77,7 @@ export default function AppointmentList() {
         )}
 
         {!isLoading && shownAppointments.length > 0 && (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="divide-y divide-line">
             {shownAppointments.map((appointment) => (
               <AppointmentCard
                 key={appointment._id}

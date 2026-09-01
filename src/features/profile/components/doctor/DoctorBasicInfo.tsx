@@ -4,21 +4,19 @@ import { useState } from "react";
 import FormInput from "@/components/ui/FormInput";
 import FormSelect from "@/components/ui/FormSelect";
 import Alert from "@/components/ui/Alert";
-import ProfileField from "@/features/profile/components/ProfileField";
-import EditableCard from "@/features/profile/components/EditableCard";
-import EditActions from "@/features/profile/components/EditActions";
-import { useEditableSection } from "@/features/profile/hooks/useEditableSection";
+import SaveButton from "@/features/profile/components/SaveButton";
+import { useSaveForm } from "@/features/profile/hooks/useSaveForm";
 import { saveDoctorProfileSection } from "@/features/profile/api/doctorProfileService";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { DOCTOR_GENDER_OPTIONS, getGenderLabel } from "@/lib/utils/profileOptions";
+import { DOCTOR_GENDER_OPTIONS } from "@/lib/utils/profileOptions";
 import type { Doctor } from "@/types";
 
-type DoctorBasicInfoProps = { doctor: Doctor; userId: string; onSaved: () => void };
+type DoctorBasicInfoProps = { doctor: Doctor; userId: string };
 
-// The doctor basic info tab.
-export default function DoctorBasicInfo({ doctor, userId, onSaved }: DoctorBasicInfoProps) {
+// The doctor basic info form.
+export default function DoctorBasicInfo({ doctor, userId }: DoctorBasicInfoProps) {
   const { updateUser } = useAuth();
-  const editor = useEditableSection(onSaved);
+  const form = useSaveForm();
 
   const [values, setValues] = useState({
     fullName: doctor.fullName ?? "",
@@ -36,30 +34,17 @@ export default function DoctorBasicInfo({ doctor, userId, onSaved }: DoctorBasic
   // Sends the form to the API when submitted.
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    editor.runSave(async () => {
+    form.runSave(async () => {
       const updatedUser = await saveDoctorProfileSection(userId, "basic", values);
       updateUser(updatedUser);
     });
   }
 
-  if (!editor.isEditing) {
-    return (
-      <EditableCard title="Basic info" onEdit={editor.openEditor}>
-        <div className="grid grid-cols-2 gap-5 sm:grid-cols-3">
-          <ProfileField label="Full name" value={doctor.fullName} />
-          <ProfileField label="Gender" value={doctor.gender ? getGenderLabel(doctor.gender) : ""} />
-          <ProfileField label="Mobile number" value={doctor.mobileNumber} />
-          <ProfileField label="City" value={doctor.city} />
-        </div>
-      </EditableCard>
-    );
-  }
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-line bg-card p-6">
-      <h3 className="font-bold text-ink">Edit basic info</h3>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <h3 className="font-bold text-ink">Basic info</h3>
 
-      {editor.errorMessage && <Alert message={editor.errorMessage} />}
+      {form.errorMessage && <Alert message={form.errorMessage} />}
 
       <FormInput
         label="Photo link"
@@ -109,7 +94,7 @@ export default function DoctorBasicInfo({ doctor, userId, onSaved }: DoctorBasic
         required
       />
 
-      <EditActions isSaving={editor.isSaving} onCancel={editor.closeEditor} />
+      <SaveButton isSaving={form.isSaving} savedOk={form.savedOk} />
     </form>
   );
 }

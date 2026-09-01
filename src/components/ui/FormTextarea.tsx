@@ -32,7 +32,7 @@ export default function FormTextarea({
         rows={rows}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
-        className={`w-full resize-none rounded-xl border border-line bg-card px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-muted focus:border-brand ${
+        className={`w-full resize-none rounded-xl border border-transparent bg-surface px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-muted focus:border-brand focus:bg-card ${
           grow ? "min-h-32 flex-1" : ""
         }`}
       />

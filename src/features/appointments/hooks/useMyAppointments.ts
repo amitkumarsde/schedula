@@ -9,6 +9,7 @@ export function useMyAppointments(userId: string) {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [reloadCount, setReloadCount] = useState(0);
 
   useEffect(() => {
     if (!userId) return;
@@ -36,7 +37,12 @@ export function useMyAppointments(userId: string) {
     return () => {
       isCurrentRequest = false;
     };
-  }, [userId]);
+  }, [userId, reloadCount]);
 
-  return { appointments, isLoading, errorMessage };
+  // Loads the appointments again.
+  function reloadAppointments() {
+    setReloadCount((current) => current + 1);
+  }
+
+  return { appointments, isLoading, errorMessage, reloadAppointments };
 }

@@ -1,5 +1,12 @@
 import mongoose, { InferSchemaType, Model } from "mongoose";
 
+const notificationSchema = new mongoose.Schema({
+  message: { type: String, required: true },
+  appointmentId: { type: mongoose.Schema.Types.ObjectId, ref: "Appointment" },
+  isRead: { type: Boolean, default: false },
+  createdAt: { type: Date, default: Date.now },
+});
+
 const doctorSchema = new mongoose.Schema(
   {
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, unique: true },
@@ -18,12 +25,15 @@ const doctorSchema = new mongoose.Schema(
     totalPatients: { type: Number, default: 0 },
     totalReviews: { type: Number, default: 0 },
     availableDays: { type: [String], default: [] },
-    morningStartTime: { type: String, default: "" },
-    morningEndTime: { type: String, default: "" },
-    eveningStartTime: { type: String, default: "" },
-    eveningEndTime: { type: String, default: "" },
-    slotDurationMinutes: { type: Number, default: 15 },
+    startTime: { type: String, default: "" },
+    endTime: { type: String, default: "" },
+    slotDuration: { type: Number, default: 15 },
+    breakDuration: { type: Number, default: 0 },
+    visitTypes: { type: [String], default: [] },
+    meetTypes: { type: [String], default: [] },
+    consultTypes: { type: [String], default: [] },
     isAvailable: { type: Boolean, default: false },
+    notifications: { type: [notificationSchema], default: [] },
   },
   { timestamps: true }
 );

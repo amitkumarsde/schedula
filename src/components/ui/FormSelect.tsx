@@ -29,7 +29,7 @@ export default function FormSelect({
         value={value}
         required={required}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full cursor-pointer rounded-xl border border-line bg-card px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-brand"
+        className="w-full cursor-pointer rounded-xl border border-transparent bg-surface px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-brand focus:bg-card"
       >
         <option value="">{placeholder}</option>
 

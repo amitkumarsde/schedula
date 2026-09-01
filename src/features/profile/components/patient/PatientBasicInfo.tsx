@@ -4,21 +4,19 @@ import { useState } from "react";
 import FormInput from "@/components/ui/FormInput";
 import FormSelect from "@/components/ui/FormSelect";
 import Alert from "@/components/ui/Alert";
-import ProfileField from "@/features/profile/components/ProfileField";
-import EditableCard from "@/features/profile/components/EditableCard";
-import EditActions from "@/features/profile/components/EditActions";
-import { useEditableSection } from "@/features/profile/hooks/useEditableSection";
+import SaveButton from "@/features/profile/components/SaveButton";
+import { useSaveForm } from "@/features/profile/hooks/useSaveForm";
 import { savePatientProfileSection } from "@/features/profile/api/patientProfileService";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { BLOOD_GROUPS, PATIENT_GENDER_OPTIONS, getGenderLabel } from "@/lib/utils/profileOptions";
+import { BLOOD_GROUPS, PATIENT_GENDER_OPTIONS } from "@/lib/utils/profileOptions";
 import type { Patient } from "@/types";
 
-type PatientBasicInfoProps = { patient: Patient; userId: string; onSaved: () => void };
+type PatientBasicInfoProps = { patient: Patient; userId: string };
 
-// The patient basic info tab.
-export default function PatientBasicInfo({ patient, userId, onSaved }: PatientBasicInfoProps) {
+// The patient basic info form.
+export default function PatientBasicInfo({ patient, userId }: PatientBasicInfoProps) {
   const { updateUser } = useAuth();
-  const editor = useEditableSection(onSaved);
+  const form = useSaveForm();
 
   // The form values, kept as text while the user is typing.
   const [values, setValues] = useState({
@@ -27,6 +25,7 @@ export default function PatientBasicInfo({ patient, userId, onSaved }: PatientBa
     gender: patient.gender ?? "",
     mobileNumber: patient.mobileNumber ?? "",
     weight: patient.weight ? String(patient.weight) : "",
+    height: patient.height ? String(patient.height) : "",
     bloodGroup: patient.bloodGroup ?? "",
     city: patient.city ?? "",
     profileImage: patient.profileImage ?? "",
@@ -40,37 +39,22 @@ export default function PatientBasicInfo({ patient, userId, onSaved }: PatientBa
   // Sends the form to the API when submitted.
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    editor.runSave(async () => {
+    form.runSave(async () => {
       const updatedUser = await savePatientProfileSection(userId, "basic", {
         ...values,
         age: Number(values.age),
         weight: Number(values.weight),
+        height: Number(values.height),
       });
       updateUser(updatedUser);
     });
   }
 
-  if (!editor.isEditing) {
-    return (
-      <EditableCard title="Basic info" onEdit={editor.openEditor}>
-        <div className="grid grid-cols-2 gap-5 sm:grid-cols-3">
-          <ProfileField label="Full name" value={patient.fullName} />
-          <ProfileField label="Age" value={patient.age ? `${patient.age} years` : ""} />
-          <ProfileField label="Gender" value={patient.gender ? getGenderLabel(patient.gender) : ""} />
-          <ProfileField label="Weight" value={patient.weight ? `${patient.weight} Kg` : ""} />
-          <ProfileField label="Blood group" value={patient.bloodGroup} />
-          <ProfileField label="Mobile number" value={patient.mobileNumber} />
-          <ProfileField label="City" value={patient.city} />
-        </div>
-      </EditableCard>
-    );
-  }
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-line bg-card p-6">
-      <h3 className="font-bold text-ink">Edit basic info</h3>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <h3 className="font-bold text-ink">Basic info</h3>
 
-      {editor.errorMessage && <Alert message={editor.errorMessage} />}
+      {form.errorMessage && <Alert message={form.errorMessage} />}
 
       <FormInput
         label="Photo link"
@@ -134,6 +118,15 @@ export default function PatientBasicInfo({ patient, userId, onSaved }: PatientBa
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
+        <FormInput
+          label="Height (cm)"
+          name="height"
+          type="number"
+          value={values.height}
+          onChange={(value) => setField("height", value)}
+          placeholder="Height in cm"
+        />
+
         <FormSelect
           label="Blood group"
           name="bloodGroup"
@@ -152,7 +145,7 @@ export default function PatientBasicInfo({ patient, userId, onSaved }: PatientBa
         />
       </div>
 
-      <EditActions isSaving={editor.isSaving} onCancel={editor.closeEditor} />
+      <SaveButton isSaving={form.isSaving} savedOk={form.savedOk} />
     </form>
   );
 }

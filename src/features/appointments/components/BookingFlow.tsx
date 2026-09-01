@@ -12,19 +12,11 @@ import { useDoctor } from "@/features/doctors/hooks/useDoctor";
 import { useDoctorSlots } from "@/features/appointments/hooks/useDoctorSlots";
 import { bookAppointment } from "@/features/appointments/api/appointmentService";
 import DoctorSummaryCard from "@/features/appointments/components/DoctorSummaryCard";
-import Calendar from "@/features/appointments/components/Calendar";
+import MonthCalendar from "@/features/appointments/components/MonthCalendar";
 import SlotPicker from "@/features/appointments/components/SlotPicker";
-import { formatLongDate, formatSlotLabel, weekdayName, nextDays } from "@/lib/utils/schedule";
-import { VISIT_TYPES, MEET_TYPES } from "@/lib/utils/appointmentOptions";
-import type { Doctor, Appointment } from "@/types";
-
-// The first upcoming day the doctor works.
-function firstAvailableDate(doctor: Doctor | null) {
-  if (!doctor) return "";
-  const days = nextDays(60);
-  const workingDay = days.find((day) => doctor.availableDays.includes(weekdayName(day.date)));
-  return workingDay ? workingDay.date : "";
-}
+import { formatLongDate, formatSlotLabel, firstWorkingDate } from "@/lib/utils/schedule";
+import { VISIT_TYPES, MEET_TYPES, CONSULT_TYPES } from "@/lib/utils/appointmentOptions";
+import type { Appointment } from "@/types";
 
 // The single page to book an appointment.
 export default function BookingFlow({ doctorId }: { doctorId: string }) {
@@ -32,17 +24,20 @@ export default function BookingFlow({ doctorId }: { doctorId: string }) {
   const { user, isLoading: isAuthLoading } = useAuth();
   const { doctor, isLoading: isDoctorLoading, errorMessage: doctorError } = useDoctor(doctorId);
 
+  const today = new Date();
+  const [viewMonth, setViewMonth] = useState({ year: today.getFullYear(), month: today.getMonth() });
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedSlot, setSelectedSlot] = useState("");
   const [visitType, setVisitType] = useState("");
   const [meetType, setMeetType] = useState("");
+  const [consultType, setConsultType] = useState("");
   const [problem, setProblem] = useState("");
   const [bookingError, setBookingError] = useState("");
   const [isBooking, setIsBooking] = useState(false);
   const [booked, setBooked] = useState<Appointment | null>(null);
 
   // The date starts on the first day the doctor works, until the patient picks another.
-  const activeDate = selectedDate || firstAvailableDate(doctor);
+  const activeDate = selectedDate || firstWorkingDate(doctor?.availableDays ?? []);
 
   const { slots, isWorkingDay, isLoading: areSlotsLoading } = useDoctorSlots(doctorId, activeDate);
 
@@ -75,6 +70,7 @@ export default function BookingFlow({ doctorId }: { doctorId: string }) {
         problem,
         visitType,
         meetType,
+        consultType,
       });
       setBooked(appointment);
     } catch (error) {
@@ -141,7 +137,7 @@ export default function BookingFlow({ doctorId }: { doctorId: string }) {
   }
 
   // Everything is ready to book only when all the choices are made.
-  const canBook = Boolean(activeDate && selectedSlot && visitType && meetType);
+  const canBook = Boolean(activeDate && selectedSlot && visitType && meetType && consultType);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
@@ -152,10 +148,14 @@ export default function BookingFlow({ doctorId }: { doctorId: string }) {
         <div className="space-y-6">
           <div>
             <p className="mb-1.5 text-sm font-medium text-ink">Select date</p>
-            <Calendar
+            <MonthCalendar
+              year={viewMonth.year}
+              month={viewMonth.month}
               selectedDate={activeDate}
-              onSelect={handleDateSelect}
+              onSelectDate={handleDateSelect}
               availableDays={doctor.availableDays}
+              disablePast
+              onChangeMonth={(year, month) => setViewMonth({ year, month })}
             />
           </div>
 
@@ -178,8 +178,30 @@ export default function BookingFlow({ doctorId }: { doctorId: string }) {
 
         {/* Right side: the visit type, meet type, problem and the book button. */}
         <div className="flex h-full flex-col gap-5">
-          <OptionGroup label="Visit type" options={VISIT_TYPES} value={visitType} onChange={setVisitType} />
-          <OptionGroup label="Meet type" options={MEET_TYPES} value={meetType} onChange={setMeetType} />
+          {/* Only the choices this doctor allows can be picked. */}
+          <OptionGroup
+            label="Visit type"
+            options={VISIT_TYPES}
+            value={visitType}
+            onChange={setVisitType}
+            allowed={doctor.visitTypes}
+          />
+
+          <OptionGroup
+            label="Meet type"
+            options={MEET_TYPES}
+            value={meetType}
+            onChange={setMeetType}
+            allowed={doctor.meetTypes}
+          />
+
+          <OptionGroup
+            label="Consult type"
+            options={CONSULT_TYPES}
+            value={consultType}
+            onChange={setConsultType}
+            allowed={doctor.consultTypes}
+          />
 
           {/* This box grows so the right side matches the height of the left side. */}
           <FormTextarea

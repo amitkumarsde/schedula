@@ -28,6 +28,9 @@ export const WEEK_DAYS = [
 
 export const SLOT_DURATIONS = [10, 15, 20, 30];
 
+// The break (gap) a doctor can keep between two slots, in minutes.
+export const BREAK_DURATIONS = [0, 5, 10, 15];
+
 export function getGenderLabel(savedValue: string) {
   const match = PATIENT_GENDER_OPTIONS.find((option) => option.value === savedValue);
   return match ? match.label : savedValue;

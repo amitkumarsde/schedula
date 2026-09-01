@@ -3,7 +3,7 @@ import mongoose, { InferSchemaType, Model } from "mongoose";
 // The doctor and patient names are copied in, so the record stays correct even if a profile changes later.
 const appointmentSchema = new mongoose.Schema(
   {
-    appointmentNumber: { type: Number, required: true },
+    appointmentNumber: { type: Number, required: true, unique: true },
     doctorUserId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     patientUserId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     doctorName: { type: String, required: true },
@@ -15,11 +15,10 @@ const appointmentSchema = new mongoose.Schema(
     problem: { type: String, default: "" },
     visitType: { type: String, default: "" },
     meetType: { type: String, default: "" },
-    status: {
-      type: String,
-      enum: ["upcoming", "completed", "cancelled"],
-      default: "upcoming",
-    },
+    consultType: { type: String, default: "" },
+    prescriptionDescription: { type: String, default: "" },
+    medicines: { type: [String], default: [] },
+    status: { type: String, enum: ["upcoming", "completed", "cancelled"], default: "upcoming" },
   },
   { timestamps: true }
 );
@@ -27,7 +26,6 @@ const appointmentSchema = new mongoose.Schema(
 type AppointmentDocument = InferSchemaType<typeof appointmentSchema>;
 
 const Appointment: Model<AppointmentDocument> =
-  mongoose.models.Appointment ||
-  mongoose.model<AppointmentDocument>("Appointment", appointmentSchema);
+  mongoose.models.Appointment || mongoose.model<AppointmentDocument>("Appointment", appointmentSchema);
 
 export default Appointment;

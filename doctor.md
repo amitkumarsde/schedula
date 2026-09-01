@@ -10,16 +10,34 @@ This file explains, in easy words, **what a doctor does in Schedula** and **whic
 
 2. **Go to the profile.** After signup you land on `/profile`, which sends a doctor to `/profile/doctor`.
 
-3. **Fill the profile.** The doctor profile page shows a **numbers row** (experience, rating, patients, reviews) and three tabs. Each tab has an **edit icon**; you edit and press **Save**.
-   - **Basic Info** — name, gender, mobile number, city, photo link. Saving this marks the account as complete.
-   - **Professional** — specialization, qualification, experience, hospital, and an "about you" note.
-   - **Availability** ("Set") — consulting days, morning and evening times, slot length, consultation fee, and a **"Show me on the doctors list"** switch.
+3. **Fill the profile.** The profile page shows a **numbers row** (experience, rating, patients, reviews) and three tabs. Tap the **edit icon** next to your name to open `/profile/doctor/edit`, where every part has its own **Save** button.
+   - **Basic Info** — name, gender, mobile number, city, photo link. Saving this marks the account as complete
+   - **Professional** — specialization, qualification, experience, hospital, and an "about you" note
+   - **Availability** — consulting days, a start and end time, the slot length, the break between two slots, the fee, and a **"Show me on the doctors list"** switch
 
-4. **Become visible.** The doctor shows up in the doctors list only after the **specialization is filled** *and* the **booking switch is on**. Then patients can find the doctor at `/doctors` and open `/doctors/[id]`.
+4. **Become visible.** You show up in the doctors list only after the **specialization is filled** *and* the **booking switch is on**. You also need a start and end time, or there are no slots to book. Then patients can find you at `/doctors` and open `/doctors/[id]`.
 
-5. **Get booked.** Patients pick a date and a free slot and book. A slot that is already booked is greyed out for other patients, so the same time is never taken twice.
+5. **Get booked.** Patients pick a date and a free slot. A slot that is already booked, or whose time has gone, is greyed out, so the same time is never taken twice.
 
-6. **See appointments.** Open `/appointments` to see the doctor's own appointments in the **Upcoming**, **Completed** and **Cancelled** tabs. Tap one to open its detail page, where the doctor can **Mark completed** or **Cancel**.
+6. **Open the dashboard.** `/dashboard` is your home. It shows:
+   - **Numbers** — today's patients, upcoming, completed, and total patients
+   - A **month calendar** with how many appointments fall on each day. Days you do not consult are greyed out
+   - A **day calendar** showing your slots for the chosen day, coloured by status (upcoming, completed, cancelled)
+   - A **month switcher** above both calendars, with this month and the next two
+
+7. **Move an appointment.** Two ways, both on the dashboard:
+   - **Drag** an upcoming appointment onto a free slot on the same day
+   - Tap its **move icon**, then pick any month, any day and a free slot
+
+   The patient gets a notification with the new time either way.
+
+8. **See appointments.** Open `/appointments` for the **Upcoming**, **Completed** and **Cancelled** tabs. Tap one to open its detail page, where you can see the patient's details (gender, age, allergies, diseases, contact number) along with the appointment.
+
+9. **Write the prescription and finish.** After the appointment's time has passed, the detail page shows a prescription form. Write the **description** and add the **medicines**, then press **Save & mark completed**. The description is needed to finish the visit. The patient can then read it.
+
+10. **Cancel if needed.** You can cancel an upcoming appointment from its detail page. The patient gets a notification.
+
+11. **Check notifications.** The **bell** in the header shows how many messages are unread. Tap it to open `/notifications` and see when a patient cancelled an appointment.
 
 > Next time, just **log in** at `/login` with your email and password to come back to the same account.
 
@@ -27,7 +45,7 @@ This file explains, in easy words, **what a doctor does in Schedula** and **whic
 
 ## Folder structure
 
-Only the files that are **about the doctor** (the doctor's own profile, and the public doctor pages patients read). Shared UI (`components/ui`) and common helpers are not listed here.
+Only the files that are **about the doctor** (your own profile and dashboard, plus the public doctor pages patients read). Shared UI (`components/ui`) and common helpers are not listed here.
 
 ```
 src/
@@ -35,11 +53,13 @@ src/
 │   ├── api/
 │   │   ├── doctors/route.ts                  The doctors list
 │   │   ├── doctors/[id]/route.ts             One doctor's full profile
-│   │   ├── doctors/[id]/slots/route.ts       Free and taken slots for a day
+│   │   ├── doctors/[id]/slots/route.ts       Free, taken and past slots for a day
 │   │   └── profile/doctor/route.ts           Read and save the doctor profile
 │   ├── doctors/page.tsx                      Public doctors list page
 │   ├── doctors/[id]/page.tsx                 Public doctor profile page
-│   └── profile/doctor/page.tsx               The doctor profile page route
+│   ├── dashboard/page.tsx                    The dashboard route
+│   ├── profile/doctor/page.tsx               The doctor profile page route
+│   └── profile/doctor/edit/page.tsx          The doctor edit page route
 ├── features/
 │   ├── doctors/
 │   │   ├── api/doctorService.ts              Calls the doctors API
@@ -50,18 +70,26 @@ src/
 │   │       ├── DoctorsBrowser.tsx            List with search and filter
 │   │       ├── FeaturedDoctors.tsx           Top doctors on the home page
 │   │       └── DoctorProfileView.tsx         Public doctor profile page
+│   ├── dashboard/
+│   │   └── components/DoctorDashboard.tsx    Numbers + both calendars
+│   ├── appointments/components/
+│   │   ├── MonthCalendar.tsx                 Month grid (booking page + dashboard)
+│   │   ├── DayCalendar.tsx                   The slots of one day
+│   │   └── DoctorPrescriptionForm.tsx        Write the prescription and finish
 │   └── profile/
 │       ├── api/doctorProfileService.ts       Calls the doctor profile API
 │       ├── hooks/useDoctorProfile.ts         Loads the doctor profile
 │       └── components/doctor/
 │           ├── DoctorProfile.tsx             Profile page (header, numbers, tabs)
-│           ├── DoctorBasicInfo.tsx           Basic Info tab
-│           ├── DoctorProfessional.tsx        Professional tab
-│           ├── DoctorAvailability.tsx        Availability (Set) tab
+│           ├── DoctorProfileEdit.tsx         Edit page (all the forms)
+│           ├── DoctorBasicInfo.tsx           Basic Info form
+│           ├── DoctorProfessional.tsx        Professional form
+│           ├── DoctorAvailability.tsx        Availability form
 │           └── DoctorStatsRow.tsx            The numbers row
 ├── lib/
 │   ├── models/Doctor.ts                      The doctor database shape
-│   └── profile/validateDoctorProfile.ts      Server checks for the doctor tabs
+│   ├── profile/validateDoctorProfile.ts      Server checks for the doctor parts
+│   └── utils/schedule.ts                     Makes the time slots
 └── types/doctor.ts                           The doctor TypeScript type
 ```
 
@@ -72,8 +100,12 @@ src/
 | Screen | Main file |
 |---|---|
 | Sign up | `src/features/auth/components/SignupForm.tsx` |
+| Dashboard | `src/features/dashboard/components/DoctorDashboard.tsx` |
 | My profile | `src/features/profile/components/doctor/DoctorProfile.tsx` |
+| Edit my profile | `src/features/profile/components/doctor/DoctorProfileEdit.tsx` |
 | Set availability | `src/features/profile/components/doctor/DoctorAvailability.tsx` |
 | My appointments | `src/features/appointments/components/AppointmentList.tsx` |
 | One appointment | `src/features/appointments/components/AppointmentDetail.tsx` |
+| Write a prescription | `src/features/appointments/components/DoctorPrescriptionForm.tsx` |
+| Notifications | `src/features/notifications/components/NotificationList.tsx` |
 | How patients see me | `src/features/doctors/components/DoctorProfileView.tsx` |

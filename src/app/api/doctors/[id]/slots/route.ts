@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import { sendSuccess, sendError, handleApiError } from "@/lib/utils/apiResponse";
-import { makeSlots, weekdayName } from "@/lib/utils/schedule";
+import { makeSlots, weekdayName, appointmentHasStarted } from "@/lib/utils/schedule";
 import Doctor from "@/lib/models/Doctor";
 import Appointment from "@/lib/models/Appointment";
 
@@ -25,10 +25,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return sendSuccess({ date, isWorkingDay: false, slots: [] });
     }
 
-    const slotTimes = [
-      ...makeSlots(doctor.morningStartTime, doctor.morningEndTime, doctor.slotDurationMinutes),
-      ...makeSlots(doctor.eveningStartTime, doctor.eveningEndTime, doctor.slotDurationMinutes),
-    ];
+    const slotTimes = makeSlots(
+      doctor.startTime,
+      doctor.endTime,
+      doctor.slotDuration,
+      doctor.breakDuration
+    );
 
     // A slot is taken if an appointment already holds it and was not cancelled.
     const booked = await Appointment.find({
@@ -38,7 +40,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     });
     const takenTimes = new Set(booked.map((appointment) => appointment.slotTime));
 
-    const slots = slotTimes.map((time) => ({ time, taken: takenTimes.has(time) }));
+    // A slot in the past cannot be booked, so mark it too.
+    const slots = slotTimes.map((time) => ({
+      time,
+      taken: takenTimes.has(time),
+      past: appointmentHasStarted(date, time),
+    }));
 
     return sendSuccess({ date, isWorkingDay: true, slots });
   } catch (error) {
