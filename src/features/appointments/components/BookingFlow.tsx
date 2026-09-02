@@ -12,10 +12,11 @@ import { useDoctor } from "@/features/doctors/hooks/useDoctor";
 import { useDoctorSlots } from "@/features/appointments/hooks/useDoctorSlots";
 import { bookAppointment } from "@/features/appointments/api/appointmentService";
 import DoctorSummaryCard from "@/features/appointments/components/DoctorSummaryCard";
-import MonthCalendar from "@/features/appointments/components/MonthCalendar";
+import AppCalendar from "@/components/ui/AppCalendar";
 import SlotPicker from "@/features/appointments/components/SlotPicker";
 import { formatLongDate, formatSlotLabel, firstWorkingDate } from "@/lib/utils/schedule";
 import { VISIT_TYPES, MEET_TYPES, CONSULT_TYPES } from "@/lib/utils/appointmentOptions";
+import { toast } from "react-toastify";
 import type { Appointment } from "@/types";
 
 // The single page to book an appointment.
@@ -24,8 +25,6 @@ export default function BookingFlow({ doctorId }: { doctorId: string }) {
   const { user, isLoading: isAuthLoading } = useAuth();
   const { doctor, isLoading: isDoctorLoading, errorMessage: doctorError } = useDoctor(doctorId);
 
-  const today = new Date();
-  const [viewMonth, setViewMonth] = useState({ year: today.getFullYear(), month: today.getMonth() });
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedSlot, setSelectedSlot] = useState("");
   const [visitType, setVisitType] = useState("");
@@ -38,6 +37,9 @@ export default function BookingFlow({ doctorId }: { doctorId: string }) {
 
   // The date starts on the first day the doctor works, until the patient picks another.
   const activeDate = selectedDate || firstWorkingDate(doctor?.availableDays ?? []);
+
+  const today = new Date();
+  const bookingMaxDate = new Date(today.getFullYear(), today.getMonth() + 3, 0);
 
   const { slots, isWorkingDay, isLoading: areSlotsLoading } = useDoctorSlots(doctorId, activeDate);
 
@@ -73,8 +75,11 @@ export default function BookingFlow({ doctorId }: { doctorId: string }) {
         consultType,
       });
       setBooked(appointment);
+      toast.success("Appointment booked");
     } catch (error) {
-      setBookingError(error instanceof Error ? error.message : "Could not book the appointment");
+      const text = error instanceof Error ? error.message : "Could not book the appointment";
+      setBookingError(text);
+      toast.error(text);
     } finally {
       setIsBooking(false);
     }
@@ -148,14 +153,12 @@ export default function BookingFlow({ doctorId }: { doctorId: string }) {
         <div className="space-y-6">
           <div>
             <p className="mb-1.5 text-sm font-medium text-ink">Select date</p>
-            <MonthCalendar
-              year={viewMonth.year}
-              month={viewMonth.month}
+            <AppCalendar
               selectedDate={activeDate}
               onSelectDate={handleDateSelect}
               availableDays={doctor.availableDays}
-              disablePast
-              onChangeMonth={(year, month) => setViewMonth({ year, month })}
+              minDate={today}
+              maxDate={bookingMaxDate}
             />
           </div>
 

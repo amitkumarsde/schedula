@@ -29,8 +29,15 @@ const patientSchema = new mongoose.Schema(
     city: { type: String, default: "" },
     allergies: { type: [String], default: [] },
     diseases: { type: [String], default: [] },
+    currentMedications: { type: [String], default: [] },
+    insuranceProvider: { type: String, default: "" },
+    insurancePolicyNumber: { type: String, default: "" },
+    emergencyName: { type: String, default: "" },
+    emergencyPhone: { type: String, default: "" },
+    emergencyRelation: { type: String, default: "" },
     documents: { type: [fileLinkSchema], default: [] },
     testReports: { type: [fileLinkSchema], default: [] },
+    appointments: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Appointment" }], default: [] },
     notifications: { type: [notificationSchema], default: [] },
   },
   { timestamps: true }
@@ -38,7 +45,6 @@ const patientSchema = new mongoose.Schema(
 
 type PatientDocument = InferSchemaType<typeof patientSchema>;
 
-const Patient: Model<PatientDocument> =
-  mongoose.models.Patient || mongoose.model<PatientDocument>("Patient", patientSchema);
+const Patient: Model<PatientDocument> = mongoose.models.Patient || mongoose.model<PatientDocument>("Patient", patientSchema);
 
 export default Patient;

@@ -31,5 +31,6 @@ export type Doctor = {
   meetTypes: string[];
   consultTypes: string[];
   isAvailable: boolean;
+  appointments: string[];
   notifications: Notification[];
 };

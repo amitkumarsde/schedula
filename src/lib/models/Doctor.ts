@@ -33,6 +33,7 @@ const doctorSchema = new mongoose.Schema(
     meetTypes: { type: [String], default: [] },
     consultTypes: { type: [String], default: [] },
     isAvailable: { type: Boolean, default: false },
+    appointments: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Appointment" }], default: [] },
     notifications: { type: [notificationSchema], default: [] },
   },
   { timestamps: true }
@@ -40,7 +41,6 @@ const doctorSchema = new mongoose.Schema(
 
 type DoctorDocument = InferSchemaType<typeof doctorSchema>;
 
-const Doctor: Model<DoctorDocument> =
-  mongoose.models.Doctor || mongoose.model<DoctorDocument>("Doctor", doctorSchema);
+const Doctor: Model<DoctorDocument> = mongoose.models.Doctor || mongoose.model<DoctorDocument>("Doctor", doctorSchema);
 
 export default Doctor;

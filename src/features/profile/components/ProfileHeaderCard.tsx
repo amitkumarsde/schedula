@@ -23,7 +23,6 @@ export default function ProfileHeaderCard({
       <Avatar imageUrl={imageUrl} fullName={fullName} size={96} />
 
       <div className="min-w-0 flex-1 text-center sm:text-left">
-        {/* The edit icon sits to the right of the name and opens the edit page. */}
         <div className="flex items-center justify-center gap-2 sm:justify-start">
           <h1 className="truncate text-2xl font-bold text-ink">{fullName}</h1>
 

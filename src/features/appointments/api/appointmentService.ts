@@ -1,5 +1,5 @@
 import { apiGet, apiPost, apiPatch } from "@/lib/api/apiClient";
-import type { Appointment, AppointmentStatus, Slot } from "@/types";
+import type { Appointment, AppointmentStatus, Slot, Medicine } from "@/types";
 
 // Loads the time slots for one doctor on one date.
 export async function getDoctorSlots(
@@ -47,18 +47,24 @@ export async function updateAppointmentStatus(
   return data.appointment;
 }
 
-// The doctor saves the prescription for one appointment.
+// The doctor saves the prescription (diagnosis, instructions and medicines).
 export async function savePrescription(
   appointmentId: string,
   userId: string,
-  prescriptionDescription: string,
-  medicines: string[]
+  prescription: { diagnosis: string; instructions: string; medicines: Medicine[] }
 ): Promise<Appointment> {
-  const data = await apiPatch(`/appointments/${appointmentId}`, {
-    userId,
-    prescriptionDescription,
-    medicines,
-  });
+  const data = await apiPatch(`/appointments/${appointmentId}`, { userId, ...prescription });
+  return data.appointment;
+}
+
+// The patient saves a review (rating and comment) for a completed appointment.
+export async function saveReview(
+  appointmentId: string,
+  userId: string,
+  rating: number,
+  comment: string
+): Promise<Appointment> {
+  const data = await apiPatch(`/appointments/${appointmentId}`, { userId, review: { rating, comment } });
   return data.appointment;
 }
 

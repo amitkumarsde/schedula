@@ -5,20 +5,47 @@ export type Appointment = {
   appointmentNumber: number;
   doctorUserId: string;
   patientUserId: string;
-  doctorName: string;
-  doctorSpecialization: string;
   consultationFee: number;
-  patientName: string;
+  doctor: AppointmentDoctor;
+  patient: AppointmentPatient;
   appointmentDate: string;
   slotTime: string;
   problem: string;
   visitType: string;
   meetType: string;
   consultType: string;
-  prescriptionDescription: string;
-  medicines: string[];
+  diagnosis: string;
+  instructions: string;
+  medicines: Medicine[];
+  review: Review | null;
   status: AppointmentStatus;
   createdAt: string;
+};
+
+export type AppointmentDoctor = {
+  id: string;
+  name: string;
+  specialization: string;
+};
+
+export type AppointmentPatient = {
+  name: string;
+  age: number;
+  gender: string;
+  mobileNumber: string;
+  allergies: string[];
+  diseases: string[];
+};
+
+export type Medicine = {
+  name: string;
+  dosage: string;
+  duration: string;
+};
+
+export type Review = {
+  rating: number;
+  comment: string;
 };
 
 export type Slot = {

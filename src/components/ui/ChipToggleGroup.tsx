@@ -7,7 +7,6 @@ type ChipToggleGroupProps = {
   onToggle: (option: string) => void;
 };
 
-// A row of chips where more than one can be turned on.
 export default function ChipToggleGroup({ label, options, selected, onToggle }: ChipToggleGroupProps) {
   return (
     <div>

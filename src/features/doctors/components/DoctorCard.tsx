@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Star, User, Award, Wallet, Clock } from "lucide-react";
-import { WEEK_DAYS } from "@/lib/utils/profileOptions";
 import type { Doctor } from "@/types";
 
 // One doctor card that links to the doctor page.
@@ -31,21 +30,19 @@ export default function DoctorCard({ doctor }: { doctor: Doctor }) {
             <h3 className="truncate text-lg font-bold text-ink">{doctor.fullName}</h3>
 
             <span className="flex shrink-0 items-center gap-1 text-sm text-muted">
-              <Star className="h-4 w-4 fill-brand text-brand" />
               {doctor.rating}
+              <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
             </span>
           </div>
 
           <p className="mt-0.5 text-sm font-medium text-brand">{doctor.specialization}</p>
 
-          {/* About the doctor, kept to two lines so all cards stay the same height. */}
           <p className="mt-1.5 line-clamp-2 text-sm text-muted">{doctor.about}</p>
 
         </div>
 
       </div>
 
-      {/* Experience, fee and consulting time. */}
       <div className="mt-2.5 flex flex-wrap justify-between items-center gap-x-4 gap-y-1 text-sm text-muted">
         <span className="flex items-center gap-1.5">
           <Award className="h-4 w-4 text-brand" />
@@ -61,24 +58,6 @@ export default function DoctorCard({ doctor }: { doctor: Doctor }) {
             {doctor.startTime} - {doctor.endTime}
           </span>
         )}
-      </div>
-
-      {/* Working days, with the available ones highlighted. */}
-      <div className="mt-2.5 flex justify-end gap-2">
-        {WEEK_DAYS.map((day) => {
-          const isOn = doctor.availableDays.includes(day);
-
-          return (
-            <span
-              key={day}
-              title={day}
-              className={`flex h-6 w-6 items-center justify-center rounded-md text-xs font-semibold ${isOn ? "bg-brand-soft text-brand" : "bg-surface text-muted"
-                }`}
-            >
-              {day[0]}
-            </span>
-          );
-        })}
       </div>
     </Link>
   );

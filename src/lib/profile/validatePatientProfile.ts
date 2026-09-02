@@ -64,14 +64,36 @@ function toCleanList(value: unknown): string[] {
 export function validatePatientMedical(body: Record<string, unknown>): CheckResult {
   const allergies = toCleanList(body.allergies);
   const diseases = toCleanList(body.diseases);
+  const currentMedications = toCleanList(body.currentMedications);
 
-  if (allergies.length > 30 || diseases.length > 30) {
+  if (allergies.length > 30 || diseases.length > 30 || currentMedications.length > 30) {
     return fail("You can add at most 30 items in a list");
   }
 
-  for (const item of [...allergies, ...diseases]) {
+  for (const item of [...allergies, ...diseases, ...currentMedications]) {
     if (item.length > 100) return fail("Each item must be 100 characters or less");
   }
 
-  return ok({ allergies, diseases });
+  return ok({ allergies, diseases, currentMedications });
+}
+
+// Checks the "Emergency & Insurance" tab.
+export function validatePatientEmergency(body: Record<string, unknown>): CheckResult {
+  const emergencyName = readOptionalText(body.emergencyName);
+  const emergencyPhone = readOptionalText(body.emergencyPhone);
+  const emergencyRelation = readOptionalText(body.emergencyRelation);
+  const insuranceProvider = readOptionalText(body.insuranceProvider);
+  const insurancePolicyNumber = readOptionalText(body.insurancePolicyNumber);
+
+  if (emergencyPhone && !MOBILE_NUMBER_PATTERN.test(emergencyPhone)) {
+    return fail("Emergency phone must be exactly 10 digits");
+  }
+
+  return ok({
+    emergencyName,
+    emergencyPhone,
+    emergencyRelation,
+    insuranceProvider,
+    insurancePolicyNumber,
+  });
 }

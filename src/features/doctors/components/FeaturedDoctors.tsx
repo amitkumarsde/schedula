@@ -1,10 +1,9 @@
 "use client";
-
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useDoctors } from "@/features/doctors/hooks/useDoctors";
 import DoctorCard from "@/features/doctors/components/DoctorCard";
 import DoctorListSkeleton from "@/features/doctors/components/DoctorListSkeleton";
-import Button from "@/components/ui/Button";
 
 const HOW_MANY_TO_SHOW = 6;
 
@@ -23,10 +22,10 @@ export default function FeaturedDoctors() {
           <p className="mt-2 text-muted">Available for appointments right now</p>
         </div>
 
-        <Button href="/doctors" variant="outline">
+        <Link href="/doctors" className="flex items-center gap-1 hover:text-brand">
           View all
           <ArrowRight className="h-4 w-4" />
-        </Button>
+        </Link>
       </div>
 
       <div className="mt-8">

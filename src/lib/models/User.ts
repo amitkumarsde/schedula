@@ -1,6 +1,5 @@
 import mongoose, { InferSchemaType, Model } from "mongoose";
 
-// The login account. Patients and doctors both start as a User.
 const userSchema = new mongoose.Schema(
   {
     fullName: { type: String, required: true, trim: true },
@@ -14,7 +13,6 @@ const userSchema = new mongoose.Schema(
 
 export type UserDocument = InferSchemaType<typeof userSchema>;
 
-const User: Model<UserDocument> =
-  mongoose.models.User || mongoose.model<UserDocument>("User", userSchema);
+const User: Model<UserDocument> = mongoose.models.User || mongoose.model<UserDocument>("User", userSchema);
 
 export default User;

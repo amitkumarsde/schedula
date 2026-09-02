@@ -24,7 +24,14 @@ export type Patient = {
   city: string;
   allergies: string[];
   diseases: string[];
+  currentMedications: string[];
+  insuranceProvider: string;
+  insurancePolicyNumber: string;
+  emergencyName: string;
+  emergencyPhone: string;
+  emergencyRelation: string;
   documents: FileLink[];
   testReports: FileLink[];
+  appointments: string[];
   notifications: Notification[];
 };

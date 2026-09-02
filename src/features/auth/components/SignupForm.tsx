@@ -5,10 +5,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, User, Stethoscope } from "lucide-react";
 import FormInput from "@/components/ui/FormInput";
-import Alert from "@/components/ui/Alert";
 import Button from "@/components/ui/Button";
 import { signupUser } from "@/features/auth/api/authService";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { toast } from "react-toastify";
 import type { UserRole } from "@/types";
 
 const ROLE_OPTIONS = [
@@ -27,7 +27,6 @@ export default function SignupForm() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
   const router = useRouter();
@@ -36,29 +35,28 @@ export default function SignupForm() {
   // Sends the form to the API when submitted.
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    setErrorMessage("");
 
     const cleanFullName = fullName.trim();
     const cleanEmail = email.trim();
 
     // Checked here too, so the user sees the problem without waiting for the server.
     if (cleanFullName.length < 3 || cleanFullName.length > 60) {
-      setErrorMessage("Full name must be between 3 and 60 characters");
+      toast.error("Full name must be between 3 and 60 characters");
       return;
     }
 
     if (!EMAIL_PATTERN.test(cleanEmail)) {
-      setErrorMessage("Please enter a valid email address");
+      toast.error("Please enter a valid email address");
       return;
     }
 
     if (password.length < 4) {
-      setErrorMessage("Password must be at least 4 characters");
+      toast.error("Password must be at least 4 characters");
       return;
     }
 
     if (password !== confirmPassword) {
-      setErrorMessage("Both passwords must be the same");
+      toast.error("Both passwords must be the same");
       return;
     }
 
@@ -67,9 +65,10 @@ export default function SignupForm() {
     try {
       const user = await signupUser(cleanFullName, cleanEmail, password, role);
       login(user);
+      toast.success("Account created");
       router.push("/profile");
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Could not create the account");
+      toast.error(error instanceof Error ? error.message : "Could not create the account");
       setIsSaving(false);
     }
   }
@@ -81,8 +80,6 @@ export default function SignupForm() {
         <p className="mt-1.5 text-center text-sm text-muted">It takes less than a minute</p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          {errorMessage && <Alert message={errorMessage} />}
-
           <div>
             <p className="mb-1.5 text-sm font-medium text-ink">I want to join as</p>
 

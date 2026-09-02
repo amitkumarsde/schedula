@@ -1,7 +1,8 @@
 "use client";
 
+import { useRef } from "react";
 import { Move, X } from "lucide-react";
-import { formatSlotLabel, formatLongDate } from "@/lib/utils/schedule";
+import { formatSlotLabel, formatLongDate, appointmentHasStarted } from "@/lib/utils/schedule";
 import type { Appointment, UserRole } from "@/types";
 
 // Soft colours so each status is easy to tell apart at a glance.
@@ -37,6 +38,8 @@ export default function DayCalendar({
   onDropOnTime,
   onClickTime,
 }: DayCalendarProps) {
+  const wasDragged = useRef(false);
+
   return (
     <div className="rounded-2xl border border-line bg-card p-4">
       <p className="text-sm font-semibold text-ink">{formatLongDate(selectedDate)}</p>
@@ -61,7 +64,7 @@ export default function DayCalendar({
         <p className="mt-3 text-sm text-muted">You do not consult on this day.</p>
       )}
 
-      <div className="thin-scrollbar mt-3 grid max-h-[26rem] grid-cols-2 gap-2 overflow-y-auto pr-1 sm:grid-cols-3">
+      <div className="thin-scrollbar mt-3 grid max-h-[30rem] grid-cols-3 gap-2 overflow-y-auto pr-1">
         {times.map((time) => {
           // The active (not cancelled) appointment holds the slot, if any.
           const appointment = (appointmentsByTime[time] ?? []).find(
@@ -70,33 +73,54 @@ export default function DayCalendar({
 
           // A free slot is a drop target.
           if (!appointment) {
+            const isPast = appointmentHasStarted(selectedDate, time);
+            const canDrop = Boolean(pickedUpId) && !isPast;
+
             return (
               <div
                 key={time}
-                onDragOver={(event) => event.preventDefault()}
-                onDrop={() => onDropOnTime(time)}
-                onClick={() => pickedUpId && onClickTime(time)}
+                onDragOver={(event) => !isPast && event.preventDefault()}
+                onDrop={() => !isPast && onDropOnTime(time)}
+                onClick={() => canDrop && onClickTime(time)}
                 className={`rounded-xl border border-dashed p-2 transition-colors ${
-                  pickedUpId ? "cursor-pointer border-brand bg-brand-soft/40" : "border-line"
+                  isPast
+                    ? "border-line opacity-40"
+                    : pickedUpId
+                      ? "cursor-pointer border-brand bg-brand-soft/40"
+                      : "border-line"
                 }`}
               >
                 <p className="text-xs font-medium text-muted">{formatSlotLabel(time)}</p>
-                <p className="mt-2 text-xs text-muted/70">{pickedUpId ? "Drop here" : "Free"}</p>
+                <p className="mt-2 text-xs text-muted/70">
+                  {isPast ? "Past" : pickedUpId ? "Drop here" : "Free"}
+                </p>
               </div>
             );
           }
 
           // A booked slot: the whole box is coloured by its status.
           const isUpcoming = appointment.status === "upcoming";
-          const title = viewerRole === "patient" ? appointment.doctorName : appointment.patientName;
+          const title = viewerRole === "patient" ? appointment.doctor.name : appointment.patient.name;
           const isPicked = pickedUpId === appointment._id;
 
           return (
             <div
               key={time}
               draggable={isUpcoming}
-              onDragStart={() => onDragStart(appointment._id)}
-              onClick={() => onOpenDetail(appointment._id)}
+              onDragStart={() => {
+                wasDragged.current = true;
+                onDragStart(appointment._id);
+              }}
+              onDragEnd={() => {
+                wasDragged.current = false;
+              }}
+              onClick={() => {
+                if (wasDragged.current) {
+                  wasDragged.current = false;
+                  return;
+                }
+                onOpenDetail(appointment._id);
+              }}
               className={`cursor-pointer rounded-xl border p-2 transition-colors ${STATUS_STYLE[appointment.status]} ${
                 isPicked ? "ring-2 ring-brand" : ""
               }`}

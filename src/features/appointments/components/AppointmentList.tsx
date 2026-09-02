@@ -8,6 +8,8 @@ import Button from "@/components/ui/Button";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { useMyAppointments } from "@/features/appointments/hooks/useMyAppointments";
 import AppointmentCard from "@/features/appointments/components/AppointmentCard";
+import { groupByDate } from "@/lib/utils/groupByDate";
+import { formatLongDate } from "@/lib/utils/schedule";
 import type { AppointmentStatus } from "@/types";
 
 // The three tabs, matching the three appointment states.
@@ -31,6 +33,7 @@ export default function AppointmentList() {
   if (isAuthLoading || !user) return null;
 
   const shownAppointments = appointments.filter((appointment) => appointment.status === activeTab);
+  const groups = groupByDate(shownAppointments, (appointment) => appointment.appointmentDate, false);
   const isPatient = user.role === "patient";
 
   return (
@@ -77,13 +80,20 @@ export default function AppointmentList() {
         )}
 
         {!isLoading && shownAppointments.length > 0 && (
-          <div className="divide-y divide-line">
-            {shownAppointments.map((appointment) => (
-              <AppointmentCard
-                key={appointment._id}
-                appointment={appointment}
-                viewerRole={user.role}
-              />
+          <div className="space-y-6">
+            {groups.map((group) => (
+              <div key={group.date}>
+                <h2 className="mb-1 text-sm font-semibold text-muted">{formatLongDate(group.date)}</h2>
+                <div className="divide-y divide-line">
+                  {group.items.map((appointment) => (
+                    <AppointmentCard
+                      key={appointment._id}
+                      appointment={appointment}
+                      viewerRole={user.role}
+                    />
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         )}

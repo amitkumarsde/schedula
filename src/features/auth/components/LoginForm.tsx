@@ -5,17 +5,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import FormInput from "@/components/ui/FormInput";
-import Alert from "@/components/ui/Alert";
 import Button from "@/components/ui/Button";
 import { loginUser } from "@/features/auth/api/authService";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { toast } from "react-toastify";
 
 // The login form.
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
   const router = useRouter();
@@ -24,10 +23,9 @@ export default function LoginForm() {
   // Sends the form to the API when submitted.
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    setErrorMessage("");
 
     if (!email.trim() || !password) {
-      setErrorMessage("Please enter your email and password");
+      toast.error("Please enter your email and password");
       return;
     }
 
@@ -37,9 +35,10 @@ export default function LoginForm() {
     try {
       const user = await loginUser(email.trim(), password);
       login(user);
+      toast.success("Logged in");
       router.push("/doctors");
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Could not log in");
+      toast.error(error instanceof Error ? error.message : "Could not log in");
       setIsSaving(false);
     }
   }
@@ -51,8 +50,6 @@ export default function LoginForm() {
         <p className="mt-1.5 text-center text-sm text-muted">Welcome back, please enter your details</p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          {errorMessage && <Alert message={errorMessage} />}
-
           <FormInput
             label="Email"
             name="email"

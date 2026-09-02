@@ -25,7 +25,7 @@ export default function OptionGroup({ label, options, value, onChange, allowed }
               onClick={() => onChange(option)}
               className={`min-w-28 flex-1 rounded-xl border px-2 py-2.5 text-center text-sm font-medium transition-colors ${
                 isActive
-                  ? "border-brand bg-brand text-on-brand"
+                  ? "cursor-pointer border-brand bg-brand text-on-brand"
                   : isDisabled
                     ? "cursor-not-allowed border-line bg-surface text-muted opacity-40"
                     : "cursor-pointer border-line bg-card text-ink hover:border-brand"

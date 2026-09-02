@@ -1,44 +1,46 @@
-import { Pill, FileText } from "lucide-react";
+import { Pill } from "lucide-react";
+import type { Medicine } from "@/types";
 
-// Read-only prescription, shown to the patient and the doctor once it is added.
+// Read-only prescription. The page above it shows the heading.
 export default function PrescriptionCard({
-  description,
+  diagnosis,
+  instructions,
   medicines,
 }: {
-  description: string;
-  medicines: string[];
+  diagnosis: string;
+  instructions: string;
+  medicines: Medicine[];
 }) {
   return (
-    <section className="space-y-4 rounded-2xl border border-line bg-card p-6">
-      <h2 className="flex items-center gap-2 font-bold text-ink">
-        <FileText className="h-5 w-5 text-brand" />
-        Prescription
-      </h2>
-
+    <div className="space-y-5">
       <div>
-        <p className="text-sm text-muted">Doctor&apos;s note</p>
-        <p className="mt-1 text-sm leading-relaxed text-ink">{description || "N/A"}</p>
+        <p className="text-sm text-muted">Diagnosis</p>
+        <p className="mt-0.5 text-sm font-medium leading-relaxed text-ink">{diagnosis || "N/A"}</p>
       </div>
 
       <div>
         <p className="text-sm text-muted">Medicines</p>
 
         {medicines.length === 0 ? (
-          <p className="mt-1 text-sm text-ink">None</p>
+          <p className="mt-0.5 text-sm font-medium text-ink">None</p>
         ) : (
           <ul className="mt-2 space-y-2">
             {medicines.map((medicine, index) => (
-              <li
-                key={index}
-                className="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-medium text-ink"
-              >
-                <Pill className="h-4 w-4 text-brand" />
-                {medicine}
+              <li key={index} className="flex items-center gap-3 rounded-xl bg-surface px-4 py-2.5">
+                <Pill className="h-4 w-4 shrink-0 text-brand" />
+                <span className="flex-1 text-sm font-medium text-ink">{medicine.name}</span>
+                {medicine.dosage && <span className="text-sm text-muted">{medicine.dosage}</span>}
+                {medicine.duration && <span className="text-sm text-muted">{medicine.duration}</span>}
               </li>
             ))}
           </ul>
         )}
       </div>
-    </section>
+
+      <div>
+        <p className="text-sm text-muted">Instructions</p>
+        <p className="mt-0.5 text-sm font-medium leading-relaxed text-ink">{instructions || "N/A"}</p>
+      </div>
+    </div>
   );
 }

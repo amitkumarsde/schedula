@@ -1,6 +1,6 @@
 # Schedula
 
-A doctor appointment app. A person can make an account, log in, fill their profile, look for doctors, and book an appointment.
+A doctor appointment app. A person can make an account, log in, fill their profile, look for a doctor, and book an appointment.
 
 > New here? Read **[patient.md](patient.md)** for the patient story and **[doctor.md](doctor.md)** for the doctor story. Both list the files each role uses.
 
@@ -14,14 +14,14 @@ A doctor appointment app. A person can make an account, log in, fill their profi
 - Doctors page with all the doctors who are open for booking
 - Search a doctor by name, specialization or city, or tap a specialization chip
 - **Profile page** with tabs, and a separate **edit page** where each part saves on its own
-  - A patient fills basic info, medical history, documents and test reports
+  - A patient fills basic info, medical history, documents, test reports, and emergency & insurance
   - A doctor fills basic info, professional details and availability
-- **Booking** for a patient: pick a doctor, pick a date, pick a free slot, choose visit type and meet type, write the problem, and confirm. Slots that are taken or already gone are greyed out
-- **Appointments page** for both roles with Upcoming, Completed and Cancelled tabs
-- **Appointment detail page** showing the doctor, the patient and the appointment. A patient can cancel
-- **Prescription**: after the visit time the doctor writes a note and a medicine list, then marks the visit completed. The patient can read it
-- **Doctor dashboard** with the day's numbers and a calendar. The doctor drags an appointment to a free slot to move it
-- **Notifications** with a bell in the header. The other person is told when an appointment is moved or cancelled
+- **Booking** for a patient: pick a doctor, pick a date, pick a free slot, choose visit type, meet type and consult type, write the problem, and confirm. Only the choices the doctor offers can be picked. Slots that are taken or already gone are greyed out
+- **Appointments page** for both roles with Upcoming, Completed and Cancelled tabs, grouped by date
+- **Appointment detail page** shows the doctor, the patient and the appointment. A patient can cancel
+- **Prescription**: after the visit time the doctor writes a diagnosis, medicines (name, dosage, duration) and instructions, then marks the visit completed. The doctor can edit it later. The patient can read it, download it as a PDF, leave a review, and rebook
+- **Doctor dashboard** with the day's numbers and two calendars (a month view and a day view). The doctor drags an appointment to a free slot, or uses the move icon, to reschedule
+- **Notifications** with a bell in the header. The other person is told when an appointment is moved, cancelled or completed
 
 ---
 
@@ -32,6 +32,8 @@ A doctor appointment app. A person can make an account, log in, fill their profi
 | Frontend | Next.js, React.js, TypeScript |
 | Styling | Tailwind CSS v4 |
 | Icons | lucide-react |
+| Calendar | react-calendar |
+| Toasts | react-toastify |
 | Backend | Next.js API routes |
 | Database | MongoDB |
 
@@ -120,10 +122,11 @@ schedula/
     │   ├── profile/            Patient and doctor profile
     │   └── home/               Home page parts
     ├── components/
-    │   ├── ui/                 Buttons, inputs, avatar, etc
+    │   ├── ui/                 Buttons, inputs, avatar, calendar, etc
     │   └── layout/             Header, footer, background circles
     ├── lib/
     │   ├── api/                One fetch helper for the whole app
+    │   ├── appointments/       Adds doctor and patient details to an appointment
     │   ├── auth/               Keeps the logged in user
     │   ├── models/             Mongoose schemas
     │   ├── profile/            Server side checks for the profile parts
@@ -166,10 +169,10 @@ Every reply has the same shape:
 | PUT | `/api/profile/patient` | Save one part of the patient profile |
 | GET | `/api/profile/doctor?userId=` | The doctor's saved profile |
 | PUT | `/api/profile/doctor` | Save one part of the doctor profile |
-| GET | `/api/appointments?userId=` | My appointments (patient or doctor, based on the role) |
+| GET | `/api/appointments?userId=` | My appointments, read through my profile, with doctor and patient details added |
 | POST | `/api/appointments` | Book one appointment (patient only) |
 | GET | `/api/appointments/[id]?userId=` | One appointment, only for the people on it |
-| PATCH | `/api/appointments/[id]` | Move it, save a prescription, cancel it or complete it |
+| PATCH | `/api/appointments/[id]` | Reschedule, review, cancel, complete, or save a prescription |
 | GET | `/api/notifications?userId=` | My notifications and how many are unread |
 | PATCH | `/api/notifications` | Mark all my notifications as read |
 
@@ -177,10 +180,11 @@ The profile, appointment and notification APIs need a `userId` so the server kno
 
 **What `PATCH /api/appointments/[id]` does** depends on what you send:
 
-- send `appointmentDate` and `slotTime` → move the appointment (doctor only)
+- send `appointmentDate` and `slotTime` → move the appointment (doctor only), and the patient gets a notification
+- send `review` → save the patient's rating and comment (patient only, completed appointment)
 - send `status` as `cancelled` → cancel it (both roles), and the other person gets a notification
-- send `status` as `completed` → finish it (doctor only, after the visit time, and a prescription note is needed)
-- send `prescriptionDescription` and `medicines` → save the prescription (doctor only, after the visit time)
+- send `status` as `completed` → finish it (doctor only, after the visit time, needs a diagnosis)
+- send `diagnosis`, `instructions` and `medicines` → save the prescription (doctor only, after the visit time or once completed)
 
 ---
 
@@ -196,27 +200,21 @@ The profile, appointment and notification APIs need a `userId` so the server kno
 | role | `patient` or `doctor` |
 | isProfileComplete | Turns `true` when the "Basic info" part is saved |
 
-**doctors** — the doctor profile
+**doctors** - the doctor profile
 
-Name, gender, photo, mobile number, specialization, qualification, experience, city, hospital, fee, rating, total patients and reviews. It also has the consulting **days**, a **start and end time**, the **slot length**, the **break** between two slots, and an `isAvailable` switch. It also keeps a **notifications** list.
+Name, gender, photo, mobile number, specialization, qualification, experience, city, hospital, fee, rating, total patients and reviews. It also has the consulting **days**, a **start and end time**, the **slot length**, the **break** between two slots, the **visit / meet / consult types** the doctor offers, and an `isAvailable` switch. It keeps a **notifications** list and a list of its **appointments**.
 
 A new doctor starts with `isAvailable: false`. Only doctors with `isAvailable: true` and a specialization show up in the doctors list.
 
-**patients** — the patient profile
+**patients** - the patient profile
 
-Name, age, gender, photo, mobile number, weight, height, blood group, city, **allergies** and **diseases** (saved as lists), and **documents** and **testReports** (saved as `{ name, link }` items). It also keeps a **notifications** list.
+Name, age, gender, photo, mobile number, weight, height, blood group, city, **allergies**, **diseases** and **current medications** (saved as lists), **documents** and **testReports** (saved as `{ name, link }` items), and **emergency contact** and **insurance** details. It keeps a **notifications** list and a list of its **appointments**.
 
-**appointments** — one booking
+**appointments** - one booking
 
-Appointment number, the patient and doctor ids, a copy of the doctor name, specialization and fee, the patient name, the date and slot time, the problem, the visit type, the meet type, the **prescription note** and **medicine list**, and a status of `upcoming`, `completed` or `cancelled`.
+Appointment number, the patient and doctor ids, the fee, the date and slot time, the problem, the visit / meet / consult type, the **prescription** (diagnosis, instructions and a medicine list of `{ name, dosage, duration }`), the patient's **review**, and a status of `upcoming`, `completed` or `cancelled`. The doctor's and patient's names come from their profiles, not from here.
 
----
-
-## How the time slots are made
-
-A doctor sets a **start time**, an **end time**, a **slot length** and a **break**. The app then makes the slots one after another:
-
-The same helper (`makeSlots` in `src/lib/utils/schedule.ts`) is used by the booking page, the slots API and the dashboard, so every screen shows the same times.
+Notifications are not their own collection. They are a list kept inside the patient profile and the doctor profile.
 
 ---
 

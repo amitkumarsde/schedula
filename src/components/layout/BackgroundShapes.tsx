@@ -1,4 +1,4 @@
-// Soft decorative circles behind the whole app. Purely visual, so it is hidden from screen readers.
+// Soft decorative circles behind the whole app.
 export default function BackgroundShapes() {
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 z-0 overflow-hidden">

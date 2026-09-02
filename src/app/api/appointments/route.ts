@@ -8,6 +8,7 @@ import User from "@/lib/models/User";
 import Doctor from "@/lib/models/Doctor";
 import Patient from "@/lib/models/Patient";
 import Appointment from "@/lib/models/Appointment";
+import { enrichAppointments } from "@/lib/appointments/enrichAppointments";
 
 // Returns the logged in user's appointments.
 export async function GET(request: NextRequest) {
@@ -20,11 +21,16 @@ export async function GET(request: NextRequest) {
     const user = await User.findById(userId);
     if (!user) return sendError("User not found", 404);
 
-    const filter = user.role === "patient" ? { patientUserId: userId } : { doctorUserId: userId };
+    // The appointment ids are read through the profile, then loaded newest first.
+    const profile =
+      user.role === "patient"
+        ? await Patient.findOne({ userId })
+        : await Doctor.findOne({ userId });
+    if (!profile) return sendError("Profile not found", 404);
 
-    const appointments = await Appointment.find(filter).sort({ createdAt: -1 });
-
-    return sendSuccess({ count: appointments.length, appointments });
+    const appointments = await Appointment.find({ _id: { $in: profile.appointments } }).sort({ createdAt: -1 });
+    const enriched = await enrichAppointments(appointments);
+    return sendSuccess({ count: enriched.length, appointments: enriched });
   } catch (error) {
     return handleApiError(error);
   }
@@ -110,16 +116,10 @@ export async function POST(request: NextRequest) {
     });
     if (alreadyBooked) return sendError("This slot was just booked, please pick another");
 
-    const patientProfile = await Patient.findOne({ userId: patientUserId });
-    const patientName = patientProfile?.fullName || patientUser.fullName;
-
     const details = {
       doctorUserId: doctor.userId,
       patientUserId,
-      doctorName: doctor.fullName,
-      doctorSpecialization: doctor.specialization,
       consultationFee: doctor.consultationFee,
-      patientName,
       appointmentDate,
       slotTime,
       problem,
@@ -135,6 +135,11 @@ export async function POST(request: NextRequest) {
           appointmentNumber: await nextAppointmentNumber(),
           ...details,
         });
+
+        // Keep a copy of the id on both profiles.
+        await Patient.updateOne({ userId: patientUserId }, { $push: { appointments: appointment._id } });
+        await Doctor.updateOne({ userId: doctor.userId }, { $push: { appointments: appointment._id } });
+
         return sendSuccess({ message: "Appointment booked", appointment }, 201);
       } catch (error) {
         if (isDuplicateKeyError(error, "appointmentNumber") && attempt < 4) continue;

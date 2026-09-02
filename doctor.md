@@ -6,24 +6,23 @@ This file explains, in easy words, **what a doctor does in Schedula** and **whic
 
 ## The doctor journey (start to end)
 
-1. **Sign up.** Open `/signup`, choose **"I am a Doctor"**, and enter full name, email and password. The server makes a login account and an **empty doctor profile row**. A new doctor is **hidden** from the doctors list at first.
+1. **Sign up.** Open `/signup`, choose **"I am a Doctor"**, and enter full name, email and password. The server makes a login account and an **empty doctor profile**. A new doctor is **hidden** from the doctors list at first.
 
 2. **Go to the profile.** After signup you land on `/profile`, which sends a doctor to `/profile/doctor`.
 
 3. **Fill the profile.** The profile page shows a **numbers row** (experience, rating, patients, reviews) and three tabs. Tap the **edit icon** next to your name to open `/profile/doctor/edit`, where every part has its own **Save** button.
-   - **Basic Info** — name, gender, mobile number, city, photo link. Saving this marks the account as complete
-   - **Professional** — specialization, qualification, experience, hospital, and an "about you" note
-   - **Availability** — consulting days, a start and end time, the slot length, the break between two slots, the fee, and a **"Show me on the doctors list"** switch
+   - **Basic Info** - name, gender, mobile number, city, photo link. Saving this marks the account as complete
+   - **Professional** - specialization, qualification, experience, hospital, and an "about you" note
+   - **Availability** - consulting days, a start and end time, the slot length, the break between two slots, the fee, the **visit / meet / consult types** you offer, and a **"Show me on the doctors list"** switch
 
-4. **Become visible.** You show up in the doctors list only after the **specialization is filled** *and* the **booking switch is on**. You also need a start and end time, or there are no slots to book. Then patients can find you at `/doctors` and open `/doctors/[id]`.
+4. **Become visible.** You show up in the doctors list only after the **specialization is filled** *and* the **booking switch is on**. You also need a start and end time and at least one of each option type, or there is nothing to book. Then patients can find you at `/doctors` and open `/doctors/[id]`.
 
-5. **Get booked.** Patients pick a date and a free slot. A slot that is already booked, or whose time has gone, is greyed out, so the same time is never taken twice.
+5. **Get booked.** Patients pick a date and a free slot, and only the option types you offer. A slot that is already booked, or whose time has gone, is greyed out, so the same time is never taken twice.
 
 6. **Open the dashboard.** `/dashboard` is your home. It shows:
    - **Numbers** — today's patients, upcoming, completed, and total patients
-   - A **month calendar** with how many appointments fall on each day. Days you do not consult are greyed out
-   - A **day calendar** showing your slots for the chosen day, coloured by status (upcoming, completed, cancelled)
-   - A **month switcher** above both calendars, with this month and the next two
+   - A **month calendar** with how many appointments fall on each day. Days you do not consult are greyed out. You can move up to two months ahead and browse up to four months back
+   - A **day calendar**, next to the month view, showing your slots for the chosen day, coloured by status (upcoming, completed)
 
 7. **Move an appointment.** Two ways, both on the dashboard:
    - **Drag** an upcoming appointment onto a free slot on the same day
@@ -31,13 +30,13 @@ This file explains, in easy words, **what a doctor does in Schedula** and **whic
 
    The patient gets a notification with the new time either way.
 
-8. **See appointments.** Open `/appointments` for the **Upcoming**, **Completed** and **Cancelled** tabs. Tap one to open its detail page, where you can see the patient's details (gender, age, allergies, diseases, contact number) along with the appointment.
+8. **See appointments.** Open `/appointments` for the **Upcoming**, **Completed** and **Cancelled** tabs, grouped by date. Tap one to open its detail page, where you can see the patient's details (gender, age, allergies, diseases, contact number) along with the appointment.
 
-9. **Write the prescription and finish.** After the appointment's time has passed, the detail page shows a prescription form. Write the **description** and add the **medicines**, then press **Save & mark completed**. The description is needed to finish the visit. The patient can then read it.
+9. **Write the prescription and finish.** After the appointment's time has passed, the detail page shows a prescription form. Write the **diagnosis**, add the **medicines** (name, dosage, duration) and any **instructions**, then press **Save & mark completed**. The diagnosis is needed to finish the visit. You can edit the prescription later too. The patient can then read it.
 
 10. **Cancel if needed.** You can cancel an upcoming appointment from its detail page. The patient gets a notification.
 
-11. **Check notifications.** The **bell** in the header shows how many messages are unread. Tap it to open `/notifications` and see when a patient cancelled an appointment.
+11. **Check notifications.** The **bell** in the header shows how many messages are unread. Tap it to open `/notifications`. A doctor gets one kind of message: an appointment **cancelled** by the patient.
 
 > Next time, just **log in** at `/login` with your email and password to come back to the same account.
 
@@ -73,7 +72,6 @@ src/
 │   ├── dashboard/
 │   │   └── components/DoctorDashboard.tsx    Numbers + both calendars
 │   ├── appointments/components/
-│   │   ├── MonthCalendar.tsx                 Month grid (booking page + dashboard)
 │   │   ├── DayCalendar.tsx                   The slots of one day
 │   │   └── DoctorPrescriptionForm.tsx        Write the prescription and finish
 │   └── profile/
@@ -86,6 +84,7 @@ src/
 │           ├── DoctorProfessional.tsx        Professional form
 │           ├── DoctorAvailability.tsx        Availability form
 │           └── DoctorStatsRow.tsx            The numbers row
+├── components/ui/AppCalendar.tsx             The month calendar (react-calendar)
 ├── lib/
 │   ├── models/Doctor.ts                      The doctor database shape
 │   ├── profile/validateDoctorProfile.ts      Server checks for the doctor parts

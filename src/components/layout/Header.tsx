@@ -34,7 +34,6 @@ export default function Header() {
             Doctors
           </Link>
 
-          {/* Nothing is shown until we know who is logged in, so the buttons do not flash. */}
           {isLoading ? null : user ? (
             <>
               {user.role === "doctor" && (
@@ -55,7 +54,6 @@ export default function Header() {
 
               <NotificationBell userId={user._id} />
 
-              {/* Plain icon link, styled the same as the notification bell. */}
               <Link
                 href="/profile"
                 aria-label="Profile"
@@ -66,11 +64,11 @@ export default function Header() {
 
               <button
                 type="button"
+                aria-label="Logout"
                 onClick={handleLogout}
-                className="flex cursor-pointer items-center gap-2 rounded-xl border border-line px-3 py-2 text-sm font-semibold text-ink transition-colors hover:border-brand hover:text-brand"
+                className="flex cursor-pointer h-10 w-10 items-center justify-center text-ink transition-colors hover:text-danger"
               >
-                <LogOut className="h-4 w-4" />
-                <span className="hidden sm:inline">Logout</span>
+                <LogOut className="h-5 w-5" />
               </button>
             </>
           ) : (

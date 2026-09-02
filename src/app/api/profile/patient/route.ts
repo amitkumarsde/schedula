@@ -4,7 +4,7 @@ import { sendSuccess, sendError, handleApiError } from "@/lib/utils/apiResponse"
 import { readJsonBody, isNonEmptyText, readOptionalText } from "@/lib/utils/apiRequest";
 import { toSafeUser } from "@/lib/auth/toSafeUser";
 import { CheckResult } from "@/lib/profile/checkResult";
-import { validatePatientBasic, validatePatientMedical } from "@/lib/profile/validatePatientProfile";
+import { validatePatientBasic, validatePatientMedical, validatePatientEmergency } from "@/lib/profile/validatePatientProfile";
 import { validateFileLinks } from "@/lib/profile/validateFileLinks";
 import User from "@/lib/models/User";
 import Patient from "@/lib/models/Patient";
@@ -15,6 +15,7 @@ const SAVE_OPTIONS = { new: true, runValidators: true };
 function checkPatientSection(section: string, body: Record<string, unknown>): CheckResult | null {
   if (section === "basic") return validatePatientBasic(body);
   if (section === "medical") return validatePatientMedical(body);
+  if (section === "emergency") return validatePatientEmergency(body);
   if (section === "documents") return validateFileLinks("documents", body);
   if (section === "reports") return validateFileLinks("testReports", body);
   return null;

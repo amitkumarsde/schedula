@@ -15,12 +15,13 @@ export default function PatientMedicalHistory({ patient, userId }: PatientMedica
   const form = useSaveForm();
   const [allergies, setAllergies] = useState<string[]>(patient.allergies ?? []);
   const [diseases, setDiseases] = useState<string[]>(patient.diseases ?? []);
+  const [currentMedications, setCurrentMedications] = useState<string[]>(patient.currentMedications ?? []);
 
   // Sends the form to the API when submitted.
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     form.runSave(async () => {
-      await savePatientProfileSection(userId, "medical", { allergies, diseases });
+      await savePatientProfileSection(userId, "medical", { allergies, diseases, currentMedications });
     });
   }
 
@@ -44,6 +45,14 @@ export default function PatientMedicalHistory({ patient, userId }: PatientMedica
         onChange={setDiseases}
         placeholder="Type a disease and press Add"
         hint="Add each disease one by one. Leave empty if you have none."
+      />
+
+      <StringListInput
+        label="Current medications"
+        items={currentMedications}
+        onChange={setCurrentMedications}
+        placeholder="Type a medicine and press Add"
+        hint="Medicines you take now. Leave empty if none."
       />
 
       <SaveButton isSaving={form.isSaving} savedOk={form.savedOk} />

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { User, HeartPulse, FileText, ClipboardList, Plus, ExternalLink } from "lucide-react";
+import { User, HeartPulse, FileText, ClipboardList, ShieldPlus, Plus, ExternalLink } from "lucide-react";
 import Alert from "@/components/ui/Alert";
 import Chip from "@/components/ui/Chip";
 import { useAuth } from "@/lib/auth/AuthContext";
@@ -20,6 +20,7 @@ const PATIENT_TABS: ProfileTab[] = [
   { key: "medical", label: "Medical History", Icon: HeartPulse },
   { key: "documents", label: "Documents", Icon: FileText },
   { key: "reports", label: "Test Reports", Icon: ClipboardList },
+  { key: "emergency", label: "Emergency & Insurance", Icon: ShieldPlus },
 ];
 
 // Shows a list of items as chips, or "None" when the list is empty.
@@ -172,6 +173,7 @@ export default function PatientProfile() {
             <div className="space-y-5">
               <ChipList label="Allergies" items={patient.allergies} />
               <ChipList label="Diseases" items={patient.diseases} />
+              <ChipList label="Current medications" items={patient.currentMedications} />
             </div>
           </ProfileSection>
         )}
@@ -182,6 +184,18 @@ export default function PatientProfile() {
 
         {activeTab === "reports" && (
           <FileLinksTab title="Test Reports" links={patient.testReports} emptyText="No test reports added yet." />
+        )}
+
+        {activeTab === "emergency" && (
+          <ProfileSection title="Emergency & Insurance">
+            <div className="grid grid-cols-2 gap-5 sm:grid-cols-3">
+              <ProfileField label="Contact name" value={patient.emergencyName} />
+              <ProfileField label="Contact phone" value={patient.emergencyPhone} />
+              <ProfileField label="Relation" value={patient.emergencyRelation} />
+              <ProfileField label="Insurance provider" value={patient.insuranceProvider} />
+              <ProfileField label="Policy number" value={patient.insurancePolicyNumber} />
+            </div>
+          </ProfileSection>
         )}
       </div>
     </div>

@@ -2,4 +2,4 @@
 export type { UserRole, LoggedInUser } from "./user";
 export type { Doctor } from "./doctor";
 export type { Patient, FileLink, Notification } from "./patient";
-export type { Appointment, AppointmentStatus, Slot } from "./appointment";
+export type { Appointment, AppointmentStatus, Slot, Medicine, Review } from "./appointment";

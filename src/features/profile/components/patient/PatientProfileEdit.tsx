@@ -10,6 +10,7 @@ import { usePatientProfile } from "@/features/profile/hooks/usePatientProfile";
 import PatientBasicInfo from "@/features/profile/components/patient/PatientBasicInfo";
 import PatientMedicalHistory from "@/features/profile/components/patient/PatientMedicalHistory";
 import FileLinksSection from "@/features/profile/components/patient/FileLinksSection";
+import PatientEmergency from "@/features/profile/components/patient/PatientEmergency";
 
 // The patient edit page: every section is a form with its own Save button.
 export default function PatientProfileEdit() {
@@ -64,6 +65,9 @@ export default function PatientProfileEdit() {
         </div>
         <div className="py-8">
           <FileLinksSection title="Test reports" links={patientProfile.testReports} userId={user._id} section="reports" />
+        </div>
+        <div className="py-8">
+          <PatientEmergency patient={patientProfile} userId={user._id} />
         </div>
       </div>
     </div>
