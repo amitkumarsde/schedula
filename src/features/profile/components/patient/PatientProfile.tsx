@@ -3,11 +3,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { User, HeartPulse, FileText, ClipboardList, ShieldPlus, Plus, ExternalLink } from "lucide-react";
+import { User, HeartPulse, FileText, ClipboardList, ShieldPlus, CheckCircle2, Plus, ExternalLink } from "lucide-react";
 import Alert from "@/components/ui/Alert";
 import Chip from "@/components/ui/Chip";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { usePatientProfile } from "@/features/profile/hooks/usePatientProfile";
+import { useMyAppointments } from "@/features/appointments/hooks/useMyAppointments";
+import SummaryCard from "@/components/ui/SummaryCard";
 import ProfileHeaderCard from "@/features/profile/components/ProfileHeaderCard";
 import ProfileTabs, { type ProfileTab } from "@/features/profile/components/ProfileTabs";
 import ProfileSection from "@/features/profile/components/ProfileSection";
@@ -101,6 +103,7 @@ export default function PatientProfile() {
   const { user, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
   const { patientProfile, isLoading, errorMessage } = usePatientProfile(user?._id ?? "");
+  const { appointments } = useMyAppointments(user?._id ?? "");
   const [activeTab, setActiveTab] = useState("basic");
 
   // A doctor who lands here is sent to their own profile page.
@@ -138,6 +141,18 @@ export default function PatientProfile() {
 
   const patient = patientProfile;
 
+  // Summary counts for the cards above the tabs.
+  const completedAppointments = appointments.filter((one) => one.status === "completed");
+  const summary = [
+    {
+      Icon: FileText,
+      label: "Total Prescriptions",
+      value: completedAppointments.filter((one) => one.diagnosis || one.medicines.length).length,
+    },
+    { Icon: CheckCircle2, label: "Completed Appointments", value: completedAppointments.length },
+    { Icon: ClipboardList, label: "Test Reports", value: patient.testReports.length },
+  ];
+
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10">
       <ProfileHeaderCard
@@ -147,6 +162,12 @@ export default function PatientProfile() {
         imageUrl={patient.profileImage}
         editHref="/profile/patient/edit"
       />
+
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {summary.map((card) => (
+          <SummaryCard key={card.label} Icon={card.Icon} label={card.label} value={card.value} />
+        ))}
+      </div>
 
       <div className="mt-6">
         <ProfileTabs tabs={PATIENT_TABS} activeKey={activeTab} onSelect={setActiveTab} />

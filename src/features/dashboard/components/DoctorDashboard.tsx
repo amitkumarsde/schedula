@@ -8,6 +8,7 @@ import { useMyAppointments } from "@/features/appointments/hooks/useMyAppointmen
 import { useDoctorProfile } from "@/features/profile/hooks/useDoctorProfile";
 import { rescheduleAppointment } from "@/features/appointments/api/appointmentService";
 import AppCalendar from "@/components/ui/AppCalendar";
+import SummaryCard from "@/components/ui/SummaryCard";
 import DayCalendar from "@/features/appointments/components/DayCalendar";
 import { makeSlots, weekdayName, todayDateText } from "@/lib/utils/schedule";
 import { toast } from "react-toastify";
@@ -110,11 +111,7 @@ export default function DoctorDashboard() {
 
       <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {stats.map((stat) => (
-          <div key={stat.label} className="rounded-2xl bg-surface p-4">
-            <stat.Icon className="h-5 w-5 text-brand" />
-            <p className="mt-3 text-2xl font-bold text-ink">{stat.value}</p>
-            <p className="text-sm text-muted">{stat.label}</p>
-          </div>
+          <SummaryCard key={stat.label} Icon={stat.Icon} label={stat.label} value={stat.value} />
         ))}
       </div>
 
