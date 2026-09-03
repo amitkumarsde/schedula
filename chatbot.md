@@ -21,7 +21,7 @@ This file explains, in easy words, the **AI chat assistant** in Schedula: what i
 - **Logged in?** It loads your saved chat and shows the old messages.
 - **You type a question and press send.** Your message shows on screen at once.
 - **The app sends it to the server** at `POST /api/chat` with your user id and message.
-- **The server checks it** — you must be logged in and the message must not be empty.
+- **The server checks it** - you must be logged in and the message must not be empty.
 - **Your message is saved** to the database.
 - **The server asks the AI.** It tries **Groq** first, then **OpenRouter** as a backup. If both fail, it returns a safe "assistant is not available" message.
 - **A rule goes with every question:** only help with Schedula, keep it short, never share private data, never give a medical diagnosis.
