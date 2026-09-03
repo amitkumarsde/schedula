@@ -8,10 +8,10 @@ import { useSaveForm } from "@/features/profile/hooks/useSaveForm";
 import { savePatientProfileSection } from "@/features/profile/api/patientProfileService";
 import type { Patient } from "@/types";
 
-type PatientMedicalHistoryProps = { patient: Patient; userId: string };
+type PatientMedicalHistoryProps = { patient: Patient; userId: string; onSaved?: () => void };
 
 // The patient medical history form.
-export default function PatientMedicalHistory({ patient, userId }: PatientMedicalHistoryProps) {
+export default function PatientMedicalHistory({ patient, userId, onSaved }: PatientMedicalHistoryProps) {
   const form = useSaveForm();
   const [allergies, setAllergies] = useState<string[]>(patient.allergies ?? []);
   const [diseases, setDiseases] = useState<string[]>(patient.diseases ?? []);
@@ -22,13 +22,11 @@ export default function PatientMedicalHistory({ patient, userId }: PatientMedica
     event.preventDefault();
     form.runSave(async () => {
       await savePatientProfileSection(userId, "medical", { allergies, diseases, currentMedications });
-    });
+    }, onSaved);
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h3 className="font-bold text-ink">Medical history</h3>
-
       {form.errorMessage && <Alert message={form.errorMessage} />}
 
       <StringListInput

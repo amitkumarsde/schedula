@@ -36,7 +36,7 @@ export default function LoginForm() {
       const user = await loginUser(email.trim(), password);
       login(user);
       toast.success("Logged in");
-      router.push("/doctors");
+      router.push("/dashboard");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not log in");
       setIsSaving(false);

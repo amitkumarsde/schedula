@@ -5,6 +5,7 @@ import { AuthProvider } from "@/lib/auth/AuthContext";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import BackgroundShapes from "@/components/layout/BackgroundShapes";
+import ChatWidget from "@/features/chatbot/components/ChatWidget";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <main className="flex-1">{children}</main>
             <Footer />
           </div>
+          <ChatWidget />
           <ToastContainer position="top-right" autoClose={3000} />
         </AuthProvider>
       </body>

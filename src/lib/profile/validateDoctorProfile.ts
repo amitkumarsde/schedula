@@ -1,5 +1,6 @@
 import { readOptionalText } from "@/lib/utils/apiRequest";
 import { MOBILE_NUMBER_PATTERN, DOCTOR_GENDER_OPTIONS, WEEK_DAYS, SLOT_DURATIONS, BREAK_DURATIONS } from "@/lib/utils/profileOptions";
+import { isValidFullName, FULL_NAME_MESSAGE, isHttpsUrl } from "@/lib/utils/validation";
 import { SPECIALIZATIONS } from "@/lib/utils/specializations";
 import { VISIT_TYPES, MEET_TYPES, CONSULT_TYPES } from "@/lib/utils/appointmentOptions";
 import { CheckResult, fail, ok } from "@/lib/profile/checkResult";
@@ -15,8 +16,8 @@ export function validateDoctorBasic(body: Record<string, unknown>): CheckResult 
   const city = readOptionalText(body.city);
   const profileImage = readOptionalText(body.profileImage);
 
-  if (fullName.length < 3 || fullName.length > 60) {
-    return fail("Full name must be between 3 and 60 characters");
+  if (!isValidFullName(fullName)) {
+    return fail(FULL_NAME_MESSAGE);
   }
 
   const allowedGenders = DOCTOR_GENDER_OPTIONS.map((option) => option.value);
@@ -32,7 +33,7 @@ export function validateDoctorBasic(body: Record<string, unknown>): CheckResult 
     return fail("City must be between 2 and 60 characters");
   }
 
-  if (profileImage && !profileImage.startsWith("https://")) {
+  if (profileImage && !isHttpsUrl(profileImage)) {
     return fail("Photo link must start with https://");
   }
 

@@ -12,7 +12,7 @@ import { WEEK_DAYS, SLOT_DURATIONS, BREAK_DURATIONS } from "@/lib/utils/profileO
 import { VISIT_TYPES, MEET_TYPES, CONSULT_TYPES } from "@/lib/utils/appointmentOptions";
 import type { Doctor } from "@/types";
 
-type DoctorAvailabilityProps = { doctor: Doctor; userId: string };
+type DoctorAvailabilityProps = { doctor: Doctor; userId: string; onSaved?: () => void };
 
 // Removes the option if it is on, or adds it if it is off.
 function toggle(list: string[], option: string) {
@@ -20,7 +20,7 @@ function toggle(list: string[], option: string) {
 }
 
 // The doctor availability form: days, times, allowed choices and fee.
-export default function DoctorAvailability({ doctor, userId }: DoctorAvailabilityProps) {
+export default function DoctorAvailability({ doctor, userId, onSaved }: DoctorAvailabilityProps) {
   const form = useSaveForm();
 
   const [days, setDays] = useState<string[]>(doctor.availableDays ?? []);
@@ -56,13 +56,11 @@ export default function DoctorAvailability({ doctor, userId }: DoctorAvailabilit
         consultationFee: Number(values.consultationFee),
         isAvailable,
       });
-    });
+    }, onSaved);
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      <h3 className="font-bold text-ink">Availability</h3>
-
       {form.errorMessage && <Alert message={form.errorMessage} />}
 
       <ChipToggleGroup

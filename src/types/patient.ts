@@ -3,9 +3,12 @@ export type FileLink = {
   url: string;
 };
 
+export type NotificationType = "reschedule" | "cancel" | "patient-cancel" | "missed" | "complete";
+
 export type Notification = {
   _id: string;
   message: string;
+  type?: NotificationType;
   appointmentId?: string;
   isRead: boolean;
   createdAt: string;

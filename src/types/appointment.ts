@@ -1,4 +1,4 @@
-export type AppointmentStatus = "upcoming" | "completed" | "cancelled";
+export type AppointmentStatus = "upcoming" | "completed" | "missed" | "cancelled";
 
 export type Appointment = {
   _id: string;
@@ -22,13 +22,13 @@ export type Appointment = {
   createdAt: string;
 };
 
-export type AppointmentDoctor = {
+type AppointmentDoctor = {
   id: string;
   name: string;
   specialization: string;
 };
 
-export type AppointmentPatient = {
+type AppointmentPatient = {
   name: string;
   age: number;
   gender: string;

@@ -1,10 +1,4 @@
-export type Notification = {
-  _id: string;
-  message: string;
-  appointmentId?: string;
-  isRead: boolean;
-  createdAt: string;
-};
+import type { Notification } from "./patient";
 
 export type Doctor = {
   _id: string;

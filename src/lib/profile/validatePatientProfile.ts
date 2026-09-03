@@ -1,5 +1,6 @@
 import { readOptionalText } from "@/lib/utils/apiRequest";
 import { MOBILE_NUMBER_PATTERN, PATIENT_GENDER_OPTIONS, BLOOD_GROUPS } from "@/lib/utils/profileOptions";
+import { isValidFullName, FULL_NAME_MESSAGE, isHttpsUrl } from "@/lib/utils/validation";
 import { CheckResult, fail, ok } from "@/lib/profile/checkResult";
 
 // Checks the patient "Basic info" tab. The model also checks gender and the age range.
@@ -15,8 +16,8 @@ export function validatePatientBasic(body: Record<string, unknown>): CheckResult
   const weight = Number(body.weight);
   const height = Number(body.height);
 
-  if (fullName.length < 3 || fullName.length > 60) {
-    return fail("Full name must be between 3 and 60 characters");
+  if (!isValidFullName(fullName)) {
+    return fail(FULL_NAME_MESSAGE);
   }
 
   if (!Number.isInteger(age) || age < 1 || age > 120) {
@@ -46,7 +47,7 @@ export function validatePatientBasic(body: Record<string, unknown>): CheckResult
     return fail("Please select a blood group from the list");
   }
 
-  if (profileImage && !profileImage.startsWith("https://")) {
+  if (profileImage && !isHttpsUrl(profileImage)) {
     return fail("Photo link must start with https://");
   }
 

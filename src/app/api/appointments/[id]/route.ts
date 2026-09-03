@@ -32,19 +32,21 @@ function cleanMedicines(value: unknown) {
     .filter((item) => item.name.length > 0);
 }
 
+type NotificationType = "reschedule" | "cancel" | "patient-cancel" | "missed" | "complete";
+
 // Adds one notification to a patient profile (found by their user id).
-async function notifyPatient(userId: unknown, message: string, appointmentId: unknown) {
+async function notifyPatient(userId: unknown, message: string, type: NotificationType, appointmentId: unknown) {
   await Patient.updateOne(
     { userId: String(userId) },
-    { $push: { notifications: { message, appointmentId: String(appointmentId), isRead: false } } }
+    { $push: { notifications: { message, type, appointmentId: String(appointmentId), isRead: false } } }
   );
 }
 
 // Adds one notification to a doctor profile (found by their user id).
-async function notifyDoctor(userId: unknown, message: string, appointmentId: unknown) {
+async function notifyDoctor(userId: unknown, message: string, type: NotificationType, appointmentId: unknown) {
   await Doctor.updateOne(
     { userId: String(userId) },
-    { $push: { notifications: { message, appointmentId: String(appointmentId), isRead: false } } }
+    { $push: { notifications: { message, type, appointmentId: String(appointmentId), isRead: false } } }
   );
 }
 
@@ -134,9 +136,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       appointment.slotTime = slotTime;
       await appointment.save();
 
+      // Tell the other person about the new time.
       await notifyPatient(
         appointment.patientUserId,
         `${doctorName} rescheduled appointment #${appointment.appointmentNumber} to ${when()}.`,
+        "reschedule",
         appointment._id
       );
 
@@ -158,35 +162,61 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       return sendSuccess({ message: "Review saved", appointment });
     }
 
-    // 3. Cancel or complete an upcoming appointment.
+    // 3. Change the status: cancel, complete or mark missed.
     if (isNonEmptyText(status)) {
-      if (status !== "completed" && status !== "cancelled") {
-        return sendError("Status must be completed or cancelled");
+      if (status !== "completed" && status !== "cancelled" && status !== "missed") {
+        return sendError("Status must be completed, cancelled or missed");
       }
       if (appointment.status !== "upcoming") {
         return sendError("This appointment can no longer be changed");
       }
 
+      const hasStarted = appointmentHasStarted(appointment.appointmentDate, appointment.slotTime);
+
+      // Cancel: the patient can cancel only before the slot time; after that only the doctor can act.
       if (status === "cancelled") {
+        if (!isDoctor && hasStarted) {
+          return sendError("The time has passed, only the doctor can update this appointment", 403);
+        }
+
         appointment.status = "cancelled";
         await appointment.save();
 
         const cancelledBy = isDoctor ? doctorName : patientName;
         const message = `${cancelledBy} cancelled appointment #${appointment.appointmentNumber} (${when()}).`;
         if (isDoctor) {
-          await notifyPatient(appointment.patientUserId, message, appointment._id);
+          // Doctor cancelled: the patient sees a red cancel notification.
+          await notifyPatient(appointment.patientUserId, message, "cancel", appointment._id);
         } else {
-          await notifyDoctor(appointment.doctorUserId, message, appointment._id);
+          // Patient cancelled: the doctor sees a blue notification.
+          await notifyDoctor(appointment.doctorUserId, message, "patient-cancel", appointment._id);
         }
 
         return sendSuccess({ message: "Appointment cancelled", appointment });
       }
 
-      // Only the doctor can complete, and only after the visit time, with a diagnosis.
-      if (!isDoctor) return sendError("Only the doctor can complete an appointment", 403);
-      if (!appointmentHasStarted(appointment.appointmentDate, appointment.slotTime)) {
-        return sendError("You can complete the visit only after its scheduled time");
+      // Complete and missed are for the doctor only, and only after the scheduled time.
+      if (!isDoctor) return sendError("Only the doctor can update this appointment", 403);
+      if (!hasStarted) {
+        return sendError("You can update this only after the scheduled time");
       }
+
+      // Missed: the patient did not attend the visit.
+      if (status === "missed") {
+        appointment.status = "missed";
+        await appointment.save();
+
+        await notifyPatient(
+          appointment.patientUserId,
+          `${doctorName} marked appointment #${appointment.appointmentNumber} (${when()}) as missed.`,
+          "missed",
+          appointment._id
+        );
+
+        return sendSuccess({ message: "Appointment marked as missed", appointment });
+      }
+
+      // Complete: needs a diagnosis first.
       if (!appointment.diagnosis) {
         return sendError("Add a diagnosis before marking it completed");
       }
@@ -197,6 +227,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       await notifyPatient(
         appointment.patientUserId,
         `${doctorName} completed appointment #${appointment.appointmentNumber} (${when()}).`,
+        "complete",
         appointment._id
       );
 
@@ -205,7 +236,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     // 4. Otherwise the doctor is saving a prescription. Allowed after the time, and still after completion.
     if (!isDoctor) return sendError("Only the doctor can add a prescription", 403);
-    if (appointment.status === "cancelled") return sendError("This appointment can no longer be changed");
+    if (appointment.status === "cancelled" || appointment.status === "missed") {
+      return sendError("This appointment can no longer be changed");
+    }
     if (
       appointment.status === "upcoming" &&
       !appointmentHasStarted(appointment.appointmentDate, appointment.slotTime)

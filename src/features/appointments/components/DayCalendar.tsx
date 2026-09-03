@@ -5,11 +5,13 @@ import { Move, X } from "lucide-react";
 import { formatSlotLabel, formatLongDate, appointmentHasStarted } from "@/lib/utils/schedule";
 import type { Appointment, UserRole } from "@/types";
 
+// The calendar shows only upcoming and completed appointments.
+type ShownStatus = "upcoming" | "completed";
+
 // Soft colours so each status is easy to tell apart at a glance.
-const STATUS_STYLE: Record<Appointment["status"], string> = {
+const STATUS_STYLE: Record<ShownStatus, string> = {
   upcoming: "border-brand bg-brand-soft text-ink",
   completed: "border-success bg-success-soft text-ink",
-  cancelled: "border-line bg-surface text-muted",
 };
 
 type DayCalendarProps = {
@@ -23,6 +25,8 @@ type DayCalendarProps = {
   onDragStart: (appointmentId: string) => void;
   onDropOnTime: (time: string) => void;
   onClickTime: (time: string) => void;
+  canReschedule?: boolean;
+  emptyText?: string;
 };
 
 // The day view: every time slot for the selected day, in a grid.
@@ -37,6 +41,8 @@ export default function DayCalendar({
   onDragStart,
   onDropOnTime,
   onClickTime,
+  canReschedule = true,
+  emptyText = "You do not consult on this day.",
 }: DayCalendarProps) {
   const wasDragged = useRef(false);
 
@@ -60,15 +66,14 @@ export default function DayCalendar({
         </div>
       )}
 
-      {times.length === 0 && (
-        <p className="mt-3 text-sm text-muted">You do not consult on this day.</p>
-      )}
+      {times.length === 0 && <p className="mt-3 text-sm text-muted">{emptyText}</p>}
 
       <div className="thin-scrollbar mt-3 grid max-h-[30rem] grid-cols-3 gap-2 overflow-y-auto pr-1">
         {times.map((time) => {
-          // The active (not cancelled) appointment holds the slot, if any.
+          // Only upcoming and completed appointments hold a slot here.
           const appointment = (appointmentsByTime[time] ?? []).find(
-            (one) => one.status !== "cancelled"
+            (one): one is Appointment & { status: ShownStatus } =>
+              one.status === "upcoming" || one.status === "completed"
           );
 
           // A free slot is a drop target.
@@ -106,7 +111,7 @@ export default function DayCalendar({
           return (
             <div
               key={time}
-              draggable={isUpcoming}
+              draggable={isUpcoming && canReschedule}
               onDragStart={() => {
                 wasDragged.current = true;
                 onDragStart(appointment._id);
@@ -128,7 +133,7 @@ export default function DayCalendar({
               <div className="flex items-center justify-between gap-1">
                 <span className="text-xs font-medium opacity-80">{formatSlotLabel(time)}</span>
 
-                {isUpcoming && (
+                {isUpcoming && canReschedule && (
                   <button
                     type="button"
                     onClick={(event) => {

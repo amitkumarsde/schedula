@@ -11,10 +11,10 @@ import { useAuth } from "@/lib/auth/AuthContext";
 import { BLOOD_GROUPS, PATIENT_GENDER_OPTIONS } from "@/lib/utils/profileOptions";
 import type { Patient } from "@/types";
 
-type PatientBasicInfoProps = { patient: Patient; userId: string };
+type PatientBasicInfoProps = { patient: Patient; userId: string; onSaved?: () => void };
 
 // The patient basic info form.
-export default function PatientBasicInfo({ patient, userId }: PatientBasicInfoProps) {
+export default function PatientBasicInfo({ patient, userId, onSaved }: PatientBasicInfoProps) {
   const { updateUser } = useAuth();
   const form = useSaveForm();
 
@@ -47,13 +47,11 @@ export default function PatientBasicInfo({ patient, userId }: PatientBasicInfoPr
         height: Number(values.height),
       });
       updateUser(updatedUser);
-    });
+    }, onSaved);
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h3 className="font-bold text-ink">Basic info</h3>
-
       {form.errorMessage && <Alert message={form.errorMessage} />}
 
       <FormInput

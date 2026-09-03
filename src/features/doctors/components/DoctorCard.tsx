@@ -52,12 +52,10 @@ export default function DoctorCard({ doctor }: { doctor: Doctor }) {
           <Wallet className="h-4 w-4 text-brand" />
           Rs {doctor.consultationFee}
         </span>
-        {doctor.startTime && doctor.endTime && (
-          <span className="flex items-center gap-1.5">
-            <Clock className="h-4 w-4 text-brand" />
-            {doctor.startTime} - {doctor.endTime}
-          </span>
-        )}
+        <span className="flex items-center gap-1.5">
+          <Clock className="h-4 w-4 text-brand" />
+          {doctor.slotDuration} min.
+        </span>
       </div>
     </Link>
   );

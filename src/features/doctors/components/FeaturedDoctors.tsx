@@ -5,7 +5,7 @@ import { useDoctors } from "@/features/doctors/hooks/useDoctors";
 import DoctorCard from "@/features/doctors/components/DoctorCard";
 import DoctorListSkeleton from "@/features/doctors/components/DoctorListSkeleton";
 
-const HOW_MANY_TO_SHOW = 6;
+const HOW_MANY_TO_SHOW = 3;
 
 // Shows the top doctors on the home page.
 export default function FeaturedDoctors() {
@@ -16,13 +16,13 @@ export default function FeaturedDoctors() {
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-16">
-      <div className="flex items-end justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
         <div>
           <h2 className="text-2xl font-bold text-ink sm:text-3xl">Top rated doctors</h2>
           <p className="mt-2 text-muted">Available for appointments right now</p>
         </div>
 
-        <Link href="/doctors" className="flex items-center gap-1 hover:text-brand">
+        <Link href="/doctors" className="flex items-center gap-1 self-end hover:text-brand sm:self-auto">
           View all
           <ArrowRight className="h-4 w-4" />
         </Link>

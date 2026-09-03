@@ -1,11 +1,5 @@
 import mongoose, { InferSchemaType, Model } from "mongoose";
-
-const notificationSchema = new mongoose.Schema({
-  message: { type: String, required: true },
-  appointmentId: { type: mongoose.Schema.Types.ObjectId, ref: "Appointment" },
-  isRead: { type: Boolean, default: false },
-  createdAt: { type: Date, default: Date.now },
-});
+import { notificationSchema } from "@/lib/models/notificationSchema";
 
 const doctorSchema = new mongoose.Schema(
   {

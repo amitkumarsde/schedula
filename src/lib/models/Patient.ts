@@ -1,4 +1,5 @@
 import mongoose, { InferSchemaType, Model } from "mongoose";
+import { notificationSchema } from "@/lib/models/notificationSchema";
 
 const fileLinkSchema = new mongoose.Schema(
   {
@@ -7,13 +8,6 @@ const fileLinkSchema = new mongoose.Schema(
   },
   { _id: false }
 );
-
-const notificationSchema = new mongoose.Schema({
-  message: { type: String, required: true },
-  appointmentId: { type: mongoose.Schema.Types.ObjectId, ref: "Appointment" },
-  isRead: { type: Boolean, default: false },
-  createdAt: { type: Date, default: Date.now },
-});
 
 const patientSchema = new mongoose.Schema(
   {

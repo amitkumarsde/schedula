@@ -3,12 +3,14 @@ import type { AppointmentStatus } from "@/types";
 const STATUS_STYLE: Record<AppointmentStatus, string> = {
   upcoming: "bg-brand-soft text-brand",
   completed: "bg-success-soft text-success",
+  missed: "bg-surface text-muted",
   cancelled: "bg-danger-soft text-danger",
 };
 
 const STATUS_LABEL: Record<AppointmentStatus, string> = {
   upcoming: "Upcoming",
   completed: "Completed",
+  missed: "Missed",
   cancelled: "Cancelled",
 };
 

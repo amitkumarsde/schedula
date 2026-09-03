@@ -9,7 +9,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
     await connectToDatabase();
 
-    const doctor = await Doctor.findById(id);
+    const doctor = await Doctor.findById(id).select("-notifications -appointments");
     if (!doctor) return sendError("Doctor not found", 404);
 
     return sendSuccess({ doctor });

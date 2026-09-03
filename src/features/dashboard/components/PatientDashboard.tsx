@@ -1,17 +1,14 @@
 "use client";
 
-import { useEffect, useState, type ComponentType } from "react";
+import { useState, type ComponentType } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarDays, Clock, CheckCircle2, Users } from "lucide-react";
+import { Clock, CheckCircle2, CalendarDays, Stethoscope } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { useMyAppointments } from "@/features/appointments/hooks/useMyAppointments";
-import { useDoctorProfile } from "@/features/profile/hooks/useDoctorProfile";
-import { rescheduleAppointment } from "@/features/appointments/api/appointmentService";
 import AppCalendar from "@/components/ui/AppCalendar";
 import SummaryCard from "@/components/ui/SummaryCard";
 import DayCalendar from "@/features/appointments/components/DayCalendar";
-import { makeSlots, weekdayName, todayDateText } from "@/lib/utils/schedule";
-import { toast } from "react-toastify";
+import { todayDateText } from "@/lib/utils/schedule";
 import type { Appointment } from "@/types";
 
 // The colour key shown under the calendar.
@@ -20,89 +17,49 @@ const LEGEND = [
   { label: "Completed", dotClass: "bg-success" },
 ];
 
-// The doctor's home: stats on top, then the appointment calendar with reschedule.
-export default function DoctorDashboard() {
-  const { user, isLoading: isAuthLoading } = useAuth();
+// The patient's home: stats on top, then a read-only calendar of their appointments.
+export default function PatientDashboard() {
+  const { user } = useAuth();
   const router = useRouter();
-  const { appointments, isLoading, reloadAppointments } = useMyAppointments(user?._id ?? "");
-  const { doctorProfile } = useDoctorProfile(user?._id ?? "");
+  const { appointments, isLoading } = useMyAppointments(user?._id ?? "");
 
   const today = new Date();
   const [selectedDate, setSelectedDate] = useState(todayDateText());
 
   const historyMin = new Date(today.getFullYear(), today.getMonth() - 4, 1);
-  const rescheduleMax = new Date(today.getFullYear(), today.getMonth() + 3, 0);
+  const futureMax = new Date(today.getFullYear(), today.getMonth() + 3, 0);
 
-  const [draggedId, setDraggedId] = useState<string | null>(null);
-  const [pickedUpId, setPickedUpId] = useState<string | null>(null);
-
-  // The dashboard is only for doctors.
-  useEffect(() => {
-    if (isAuthLoading) return;
-    if (!user) router.push("/login");
-    else if (user.role !== "doctor") router.push("/appointments");
-  }, [isAuthLoading, user, router]);
-
-  if (isAuthLoading || !user || user.role !== "doctor") return null;
+  if (!user) return null;
 
   const todayText = todayDateText();
-
   const todayCount = appointments.filter(
     (one) => one.appointmentDate === todayText && one.status !== "cancelled"
   ).length;
   const upcomingCount = appointments.filter((one) => one.status === "upcoming").length;
   const completedCount = appointments.filter((one) => one.status === "completed").length;
-  const totalPatients = new Set(appointments.map((one) => one.patientUserId)).size;
 
   const stats: { Icon: ComponentType<{ className?: string }>; label: string; value: number; href?: string }[] = [
-    { Icon: CalendarDays, label: "Today's patients", value: todayCount },
+    { Icon: Stethoscope, label: "Today's doctors", value: todayCount },
     { Icon: Clock, label: "Upcoming", value: upcomingCount, href: "/appointments?status=upcoming" },
     { Icon: CheckCircle2, label: "Completed", value: completedCount, href: "/appointments?status=completed" },
-    { Icon: Users, label: "Total patients", value: totalPatients },
+    { Icon: CalendarDays, label: "Total appointments", value: appointments.length },
   ];
 
-  // Count only upcoming and completed appointments on each date, to match the calendar.
+  // The calendar shows only upcoming and completed appointments.
+  const shown = appointments.filter((one) => one.status === "upcoming" || one.status === "completed");
+
   const countsByDate: Record<string, number> = {};
-  for (const appointment of appointments) {
-    if (appointment.status !== "upcoming" && appointment.status !== "completed") continue;
+  for (const appointment of shown) {
     countsByDate[appointment.appointmentDate] = (countsByDate[appointment.appointmentDate] ?? 0) + 1;
   }
 
   // The appointments on the selected day, grouped by their time.
-  const dayAppointments = appointments.filter((one) => one.appointmentDate === selectedDate);
+  const dayAppointments = shown.filter((one) => one.appointmentDate === selectedDate);
   const appointmentsByTime: Record<string, Appointment[]> = {};
   for (const appointment of dayAppointments) {
     (appointmentsByTime[appointment.slotTime] ??= []).push(appointment);
   }
-
-  // The time slots come from the doctor's own profile.
-  const isWorkingDay = doctorProfile ? doctorProfile.availableDays.includes(weekdayName(selectedDate)) : false;
-  const slotTimes =
-    isWorkingDay && doctorProfile
-      ? makeSlots(
-          doctorProfile.startTime,
-          doctorProfile.endTime,
-          doctorProfile.slotDuration,
-          doctorProfile.breakDuration
-        )
-      : [];
-  const times = Array.from(new Set([...slotTimes, ...dayAppointments.map((a) => a.slotTime)])).sort();
-
-  // Moves one appointment to the selected day and the chosen time.
-  async function reschedule(appointmentId: string | null, time: string) {
-    if (!appointmentId || !user) return;
-
-    try {
-      await rescheduleAppointment(appointmentId, user._id, selectedDate, time);
-      toast.success("Appointment rescheduled. The patient has been notified.");
-      reloadAppointments();
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not reschedule");
-    } finally {
-      setDraggedId(null);
-      setPickedUpId(null);
-    }
-  }
+  const times = Array.from(new Set(dayAppointments.map((one) => one.slotTime))).sort();
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
@@ -116,9 +73,7 @@ export default function DoctorDashboard() {
       </div>
 
       <h2 className="mt-10 text-lg font-bold text-ink">Appointment calendar</h2>
-      <p className="mt-1 text-sm text-muted">
-        Move an appointment up to two months ahead; browse up to four months back to see history.
-      </p>
+      <p className="mt-1 text-sm text-muted">Your upcoming and completed appointments.</p>
 
       {isLoading ? (
         <div className="mt-4 h-96 animate-pulse rounded-2xl bg-surface" />
@@ -128,10 +83,9 @@ export default function DoctorDashboard() {
             <AppCalendar
               selectedDate={selectedDate}
               onSelectDate={setSelectedDate}
-              availableDays={doctorProfile?.availableDays}
               countsByDate={countsByDate}
               minDate={historyMin}
-              maxDate={rescheduleMax}
+              maxDate={futureMax}
             />
 
             <DayCalendar
@@ -139,12 +93,14 @@ export default function DoctorDashboard() {
               times={times}
               appointmentsByTime={appointmentsByTime}
               viewerRole={user.role}
-              pickedUpId={pickedUpId}
+              pickedUpId={null}
               onOpenDetail={(id) => router.push(`/appointments/${id}`)}
-              onPickUp={(id) => setPickedUpId((current) => (current === id ? null : id))}
-              onDragStart={setDraggedId}
-              onDropOnTime={(time) => reschedule(draggedId, time)}
-              onClickTime={(time) => reschedule(pickedUpId, time)}
+              onPickUp={() => {}}
+              onDragStart={() => {}}
+              onDropOnTime={() => {}}
+              onClickTime={() => {}}
+              canReschedule={false}
+              emptyText="No appointments on this day."
             />
           </div>
 
@@ -158,7 +114,6 @@ export default function DoctorDashboard() {
           </div>
         </>
       )}
-
     </div>
   );
 }

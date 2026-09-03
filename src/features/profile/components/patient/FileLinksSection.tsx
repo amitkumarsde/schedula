@@ -7,17 +7,18 @@ import Alert from "@/components/ui/Alert";
 import SaveButton from "@/features/profile/components/SaveButton";
 import { useSaveForm } from "@/features/profile/hooks/useSaveForm";
 import { savePatientProfileSection } from "@/features/profile/api/patientProfileService";
+import { isHttpsUrl } from "@/lib/utils/validation";
 import type { FileLink } from "@/types";
 
 type FileLinksSectionProps = {
-  title: string;
   links: FileLink[];
   userId: string;
   section: "documents" | "reports";
+  onSaved?: () => void;
 };
 
 // A file is saved as a link, because the project has no file storage yet.
-export default function FileLinksSection({ title, links, userId, section }: FileLinksSectionProps) {
+export default function FileLinksSection({ links, userId, section, onSaved }: FileLinksSectionProps) {
   const form = useSaveForm();
   const [draftLinks, setDraftLinks] = useState<FileLink[]>(links);
   const [newName, setNewName] = useState("");
@@ -30,7 +31,7 @@ export default function FileLinksSection({ title, links, userId, section }: File
       setAddError("Please fill both the name and the link");
       return;
     }
-    if (!newUrl.trim().startsWith("https://")) {
+    if (!isHttpsUrl(newUrl.trim())) {
       setAddError("The link must start with https://");
       return;
     }
@@ -51,13 +52,11 @@ export default function FileLinksSection({ title, links, userId, section }: File
     event.preventDefault();
     form.runSave(async () => {
       await savePatientProfileSection(userId, section, { links: draftLinks });
-    });
+    }, onSaved);
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h3 className="font-bold text-ink">{title}</h3>
-
       {form.errorMessage && <Alert message={form.errorMessage} />}
 
       {draftLinks.length === 0 ? (

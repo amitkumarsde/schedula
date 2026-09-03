@@ -11,6 +11,7 @@ import { useAuth } from "@/lib/auth/AuthContext";
 import { useAppointment } from "@/features/appointments/hooks/useAppointment";
 import { updateAppointmentStatus } from "@/features/appointments/api/appointmentService";
 import AppointmentStatusBadge from "@/features/appointments/components/AppointmentStatusBadge";
+import PendingActionBadge from "@/features/appointments/components/PendingActionBadge";
 import PrescriptionCard from "@/features/appointments/components/PrescriptionCard";
 import DoctorPrescriptionForm from "@/features/appointments/components/DoctorPrescriptionForm";
 import AppointmentReview from "@/features/appointments/components/AppointmentReview";
@@ -68,19 +69,19 @@ export default function AppointmentDetail({ appointmentId }: { appointmentId: st
     if (!isAuthLoading && !user) router.push("/login");
   }, [isAuthLoading, user, router]);
 
-  // Cancels the appointment, then reloads the page.
-  async function cancelAppointment() {
+  // Cancels or marks the appointment missed, then reloads the page.
+  async function changeStatus(status: "cancelled" | "missed", successText: string) {
     if (!user) return;
 
     setActionError("");
     setIsUpdating(true);
 
     try {
-      await updateAppointmentStatus(appointmentId, user._id, "cancelled");
-      toast.success("Appointment cancelled");
+      await updateAppointmentStatus(appointmentId, user._id, status);
+      toast.success(successText);
       reloadAppointment();
     } catch (error) {
-      const text = error instanceof Error ? error.message : "Could not cancel the appointment";
+      const text = error instanceof Error ? error.message : "Could not update the appointment";
       setActionError(text);
       toast.error(text);
     } finally {
@@ -107,11 +108,12 @@ export default function AppointmentDetail({ appointmentId }: { appointmentId: st
   const isDoctor = user.role === "doctor";
   const isUpcoming = appointment.status === "upcoming";
   const isCompleted = appointment.status === "completed";
+  // True once the slot time has passed.
   const hasStarted = appointmentHasStarted(appointment.appointmentDate, appointment.slotTime);
   const hasPrescription = Boolean(
     appointment.diagnosis || appointment.instructions || appointment.medicines.length
   );
-  // The doctor can write the prescription after the time, and can still edit it once completed.
+  // The doctor can write the prescription once the time has passed, and can still edit it after completion.
   const canPrescribe = isDoctor && (isCompleted || (isUpcoming && hasStarted));
 
   return (
@@ -128,7 +130,11 @@ export default function AppointmentDetail({ appointmentId }: { appointmentId: st
         <h1 className="text-2xl font-bold text-ink sm:text-3xl">
           Appointment #{appointment.appointmentNumber}
         </h1>
-        <AppointmentStatusBadge status={appointment.status} />
+        {isUpcoming && hasStarted ? (
+          <PendingActionBadge viewerRole={user.role} />
+        ) : (
+          <AppointmentStatusBadge status={appointment.status} />
+        )}
       </div>
 
       <div className="mt-6 grid gap-8 lg:grid-cols-3">
@@ -234,9 +240,29 @@ export default function AppointmentDetail({ appointmentId }: { appointmentId: st
                 </Button>
               )}
 
-              <Button variant="outline" onClick={cancelAppointment} disabled={isUpdating} fullWidth>
-                Cancel appointment
-              </Button>
+              {/* The doctor marks a missed visit once the slot time has passed. */}
+              {isDoctor && hasStarted && (
+                <Button
+                  variant="outline"
+                  onClick={() => changeStatus("missed", "Appointment marked as missed")}
+                  disabled={isUpdating}
+                  fullWidth
+                >
+                  Mark as missed
+                </Button>
+              )}
+
+              {/* The patient can cancel only before the slot time; the doctor can cancel any time. */}
+              {(isDoctor || !hasStarted) && (
+                <Button
+                  variant="outline"
+                  onClick={() => changeStatus("cancelled", "Appointment cancelled")}
+                  disabled={isUpdating}
+                  fullWidth
+                >
+                  Cancel appointment
+                </Button>
+              )}
             </div>
           )}
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { getErrorMessage } from "@/lib/utils/getErrorMessage";
 
 // Holds the saving state for one profile form on the edit page.
 export function useSaveForm() {
@@ -8,8 +9,8 @@ export function useSaveForm() {
   const [errorMessage, setErrorMessage] = useState("");
   const [savedOk, setSavedOk] = useState(false);
 
-  // Runs a save action and shows the error or a "Saved" message.
-  async function runSave(action: () => Promise<void>) {
+  // Runs a save action; calls onSuccess only when the save works.
+  async function runSave(action: () => Promise<void>, onSuccess?: () => void) {
     setErrorMessage("");
     setSavedOk(false);
     setIsSaving(true);
@@ -17,8 +18,9 @@ export function useSaveForm() {
     try {
       await action();
       setSavedOk(true);
+      onSuccess?.();
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Could not save");
+      setErrorMessage(getErrorMessage(error, "Could not save"));
     } finally {
       setIsSaving(false);
     }

@@ -10,7 +10,22 @@ import { useNotifications } from "@/features/notifications/hooks/useNotification
 import { markNotificationsRead } from "@/features/notifications/api/notificationService";
 import { groupByDate } from "@/lib/utils/groupByDate";
 import { toDateText, formatLongDate } from "@/lib/utils/schedule";
-import type { Notification } from "@/types";
+import type { Notification, NotificationType } from "@/types";
+
+// The dot colour for each kind of update.
+const DOT_COLOR: Record<NotificationType, string> = {
+  reschedule: "bg-warning",
+  cancel: "bg-danger",
+  "patient-cancel": "bg-brand",
+  missed: "bg-muted",
+  complete: "bg-success",
+};
+
+// Picks the dot colour: by type when we have one, otherwise brand for unread.
+function dotClass(notification: Notification) {
+  if (notification.type && DOT_COLOR[notification.type]) return DOT_COLOR[notification.type];
+  return notification.isRead ? "bg-line" : "bg-brand";
+}
 
 // The "2026-09-01" day of a notification, used to group them.
 function dayKey(isoDate: string) {
@@ -31,9 +46,7 @@ function NotificationRow({ notification }: { notification: Notification }) {
 
   const inner = (
     <>
-      <span
-        className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${notification.isRead ? "bg-line" : "bg-brand"}`}
-      />
+      <span className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${dotClass(notification)}`} />
 
       <div className="min-w-0 flex-1">
         <p className={`text-sm ${notification.isRead ? "text-ink" : "font-medium text-ink"}`}>

@@ -1,33 +1,48 @@
 import Link from "next/link";
 import { Clock, ChevronRight } from "lucide-react";
-import { formatSlotLabel } from "@/lib/utils/schedule";
+import { formatSlotLabel, appointmentHasStarted } from "@/lib/utils/schedule";
+import AppointmentStatusBadge from "@/features/appointments/components/AppointmentStatusBadge";
+import PendingActionBadge from "@/features/appointments/components/PendingActionBadge";
 import type { Appointment, UserRole } from "@/types";
 
 // One appointment row that links to its detail page.
 export default function AppointmentCard({
   appointment,
   viewerRole,
+  showStatus = false,
 }: {
   appointment: Appointment;
   viewerRole: UserRole;
+  showStatus?: boolean;
 }) {
   const isPatient = viewerRole === "patient";
   const title = isPatient ? appointment.doctor.name : appointment.patient.name;
   const subtitle = isPatient
     ? appointment.doctor.specialization
     : `${appointment.patient.gender}, ${appointment.patient.age}`;
+  // An upcoming visit whose slot time has passed still needs the doctor to act.
+  const needsAction =
+    appointment.status === "upcoming" &&
+    appointmentHasStarted(appointment.appointmentDate, appointment.slotTime);
 
   return (
     <Link
       href={`/appointments/${appointment._id}`}
       className="flex items-center gap-3 rounded-xl px-3 py-4 transition-colors hover:bg-surface"
     >
-      <span className="h-2 w-2 shrink-0 rounded-full bg-brand" />
-
       <div className="min-w-0 flex-1">
-        <h3 className="truncate font-semibold text-ink">{title}</h3>
+        <div className="flex items-center gap-2">
+          <h3 className="truncate font-semibold text-ink">{title}</h3>
+          <span className="shrink-0 text-sm font-medium text-muted">#{appointment.appointmentNumber}</span>
+        </div>
         {subtitle && <p className="truncate text-sm capitalize text-muted">{subtitle}</p>}
       </div>
+
+      {needsAction ? (
+        <PendingActionBadge viewerRole={viewerRole} />
+      ) : (
+        showStatus && <AppointmentStatusBadge status={appointment.status} />
+      )}
 
       <span className="hidden shrink-0 items-center gap-1.5 text-sm font-medium text-ink sm:flex">
         <Clock className="h-4 w-4 text-brand" />

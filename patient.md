@@ -1,72 +1,68 @@
 # Patient Guide
 
-This file explains, in easy words, **what a patient does in Schedula** and **which files make it work**. Read it top to bottom to follow one patient from signup to booking.
+This file lists, in easy words, **what a patient can do in Schedula** and **which files make it work**. Shared UI (`components/ui`) and common helpers are not listed here.
 
 ---
 
-## The patient journey (start to end)
+## What a patient can do
 
-1. **Sign up.** Open `/signup`, choose **"I am a Patient"**, and enter full name, email and password. The server makes a login account and an **empty patient profile** (only the name is filled for now).
+- **Sign up and log in.** Create a patient account with full name, email and password.
 
-2. **Go to the profile.** After signup you land on `/profile`, which sends a patient to `/profile/patient`.
+- **Fill the profile.** The profile page has a **name card** and tabs. Each tab has its own **Edit** button that opens the form in place and saves on its own.
+  - **Basic Info** - age, gender, mobile number, weight, height, blood group, city, photo link. Saving this marks the account as complete
+  - **Medical History** - allergies, diseases and current medications, added as chips
+  - **Documents** - links to your documents
+  - **Test Reports** - links to your test reports
+  - **Emergency & Insurance** - emergency contact and insurance details
 
-3. **Fill the profile.** The profile page shows your details in tabs. Tap the **edit icon** next to your name to open `/profile/patient/edit`, where every part has its own **Save** button.
-   - **Basic Info** - age, gender, mobile number, weight, height, blood group, city, photo link. Saving this marks the account as complete
-   - **Medical History** - allergies, diseases and current medications, added one at a time as chips
-   - **Documents** - links to your documents
-   - **Test Reports** - links to your test reports
-   - **Emergency & Insurance** - emergency contact and insurance details
+- **Find a doctor.** Open `/doctors`. Search by name, specialization or city, or tap a specialization chip.
 
-   On the Documents and Test Reports tabs there is a **+** icon that takes you straight to the edit page.
+- **Open a doctor.** Tap a card to see the photo, about, consulting time, slot length, fee, and a **Book appointment** button.
 
-4. **Find a doctor.** Open `/doctors` (the **Doctors** link in the header). Search by name, specialization or city, or tap a specialization chip. Each card shows the doctor's about text, experience, fee and the days they work.
+- **Book an appointment.** On one page: pick a **date**, pick a free **slot**, choose a **visit / meet / consult type** (only the ones the doctor offers), write the **problem**, and press **Book appointment**. Taken or past slots are greyed out.
 
-5. **Open a doctor.** Tap a doctor card to open `/doctors/[id]` — photo, numbers, about, consulting time, slot length, fee, and a **Book appointment** button (only patients see this button).
+- **See the dashboard.** `/dashboard` shows your numbers (today's doctors, upcoming, completed, total) and a read-only **calendar** of your appointments.
 
-6. **Book the appointment.** On `/doctors/[id]/book`, all on one page:
-   - Pick a **date** on the calendar (past days and days the doctor does not work are greyed out)
-   - Pick a **slot** from the list. All the times run one after another. A slot that is taken, or whose time has already gone, is greyed out
-   - Choose a **Visit type**, a **Meet type** and a **Consult type**. Only the choices the doctor offers can be picked; the rest are greyed out
-   - Write your **problem**
-   - Press **Book appointment**
+- **See appointments.** `/appointments` has **All**, **Upcoming**, **Completed**, **Missed** and **Cancelled** tabs, grouped by date. The detail page shows the doctor and the appointment, and lets you **cancel** an upcoming one.
 
-7. **See the confirmation.** You get the appointment number and a **View my appointment** button.
+- **After the visit.** When the doctor completes the appointment, read the **prescription**, **download it as a PDF**, leave a **review**, and **rebook** with the same doctor.
 
-8. **Manage appointments.** Open `/appointments` to see the **Upcoming**, **Completed** and **Cancelled** tabs, grouped by date. Tap one to open its detail page. There you can see the doctor, your own details and the appointment, and you can **Cancel** an upcoming one. The doctor is told when you cancel.
+- **Notifications.** The **bell** in the header shows unread updates. A patient is told when an appointment is **rescheduled**, **cancelled**, **completed** or **missed**.
 
-9. **After the visit.** When the doctor completes the appointment, the detail page shows the **prescription** (diagnosis, medicines and instructions). You can **download it as a PDF**, leave a **review** (rating and comment), and **rebook** with the same doctor.
-
-10. **Check notifications.** The **bell** in the header shows how many messages are unread. Tap it to open `/notifications`. A patient gets three kinds of message from the doctor: appointment **rescheduled**, **cancelled** or **completed**.
-
-> Next time, just **log in** at `/login` with your email and password to come back to the same account.
+- **Chat assistant.** A chat button at the bottom right answers "how do I..." questions about using Schedula (see [chatbot.md](chatbot.md)).
 
 ---
 
 ## Folder structure
 
-Only the files that are **about the patient**. Shared UI (`components/ui`) and common helpers are not listed here.
+Only the files that are **about the patient**.
 
 ```
 src/
 ├── app/
-│   ├── api/profile/patient/route.ts         Read and save the patient profile
-│   ├── profile/patient/page.tsx             The patient profile page route
-│   └── profile/patient/edit/page.tsx        The patient edit page route
-├── features/profile/
-│   ├── api/patientProfileService.ts         Calls the patient profile API
-│   ├── hooks/usePatientProfile.ts           Loads the patient profile
-│   ├── hooks/useSaveForm.ts                 Holds the saving state of one form
-│   └── components/patient/
-│       ├── PatientProfile.tsx               Profile page (header + tabs)
-│       ├── PatientProfileEdit.tsx           Edit page (all the forms)
-│       ├── PatientBasicInfo.tsx             Basic Info form
-│       ├── PatientMedicalHistory.tsx        Medical History form
-│       ├── FileLinksSection.tsx             Documents and Test Reports form
-│       └── PatientEmergency.tsx             Emergency & Insurance form
-├── lib/
-│   ├── models/Patient.ts                    The patient database shape
-│   └── profile/validatePatientProfile.ts    Server checks for the patient parts
-└── types/patient.ts                         The patient TypeScript type
+│   ├── api/
+│   │   └── profile/patient/route.ts             Read and save the patient profile
+│   ├── dashboard/page.tsx                       The dashboard route
+│   └── profile/patient/page.tsx                 The patient profile page route
+├── features/       
+│   ├── dashboard/   
+│   │   └── components/PatientDashboard.tsx      Numbers + appointment calendar
+│   └── profile/  
+│       ├── api/patientProfileService.ts         Calls the patient profile API
+│       ├── hooks/usePatientProfile.ts           Loads the patient profile
+│       ├── hooks/useSaveForm.ts                 Holds the saving state of one form
+│       └── components/    
+│           ├── EditableSection.tsx              The read view + Edit button wrapper
+│           └── patient/  
+│               ├── PatientProfile.tsx           Profile page (name card + tabs)
+│               ├── PatientBasicInfo.tsx         Basic Info form
+│               ├── PatientMedicalHistory.tsx    Medical History form
+│               ├── FileLinksSection.tsx         Documents and Test Reports form
+│               └── PatientEmergency.tsx         Emergency & Insurance form
+├── lib/     
+│   ├── models/Patient.ts                        The patient database shape
+│   └── profile/validatePatientProfile.ts        Server checks for the patient parts
+└── types/patient.ts                             The patient TypeScript type
 ```
 
 ---
@@ -76,8 +72,8 @@ src/
 | Screen | Main file |
 |---|---|
 | Sign up | `src/features/auth/components/SignupForm.tsx` |
-| My profile | `src/features/profile/components/patient/PatientProfile.tsx` |
-| Edit my profile | `src/features/profile/components/patient/PatientProfileEdit.tsx` |
+| Dashboard | `src/features/dashboard/components/PatientDashboard.tsx` |
+| My profile (view + edit) | `src/features/profile/components/patient/PatientProfile.tsx` |
 | Doctors list | `src/features/doctors/components/DoctorsBrowser.tsx` |
 | One doctor | `src/features/doctors/components/DoctorProfileView.tsx` |
 | Book | `src/features/appointments/components/BookingFlow.tsx` |

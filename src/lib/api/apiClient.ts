@@ -45,3 +45,7 @@ export async function apiPut(path: string, body: unknown) {
 export async function apiPatch(path: string, body: unknown) {
   return sendJson(path, "PATCH", body);
 }
+
+export async function apiDelete(path: string) {
+  return request(path, { method: "DELETE" });
+}

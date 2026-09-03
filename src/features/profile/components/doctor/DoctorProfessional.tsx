@@ -11,10 +11,10 @@ import { saveDoctorProfileSection } from "@/features/profile/api/doctorProfileSe
 import { SPECIALIZATIONS } from "@/lib/utils/specializations";
 import type { Doctor } from "@/types";
 
-type DoctorProfessionalProps = { doctor: Doctor; userId: string };
+type DoctorProfessionalProps = { doctor: Doctor; userId: string; onSaved?: () => void };
 
 // The doctor professional details form.
-export default function DoctorProfessional({ doctor, userId }: DoctorProfessionalProps) {
+export default function DoctorProfessional({ doctor, userId, onSaved }: DoctorProfessionalProps) {
   const form = useSaveForm();
 
   const [values, setValues] = useState({
@@ -38,13 +38,11 @@ export default function DoctorProfessional({ doctor, userId }: DoctorProfessiona
         ...values,
         experienceYears: Number(values.experienceYears),
       });
-    });
+    }, onSaved);
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h3 className="font-bold text-ink">Professional details</h3>
-
       {form.errorMessage && <Alert message={form.errorMessage} />}
 
       <div className="grid gap-4 sm:grid-cols-2">

@@ -1,4 +1,5 @@
 import { CheckResult, fail, ok } from "@/lib/profile/checkResult";
+import { isHttpsUrl } from "@/lib/utils/validation";
 
 const MAX_LINKS = 20;
 
@@ -17,7 +18,7 @@ export function validateFileLinks(fieldName: string, body: Record<string, unknow
     const url = typeof link.url === "string" ? link.url.trim() : "";
 
     if (!name) return fail("Please give every link a name");
-    if (!url.startsWith("https://")) return fail("Every link must start with https://");
+    if (!isHttpsUrl(url)) return fail("Every link must start with https://");
 
     cleanLinks.push({ name, url });
   }

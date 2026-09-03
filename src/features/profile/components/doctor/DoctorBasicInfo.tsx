@@ -11,10 +11,10 @@ import { useAuth } from "@/lib/auth/AuthContext";
 import { DOCTOR_GENDER_OPTIONS } from "@/lib/utils/profileOptions";
 import type { Doctor } from "@/types";
 
-type DoctorBasicInfoProps = { doctor: Doctor; userId: string };
+type DoctorBasicInfoProps = { doctor: Doctor; userId: string; onSaved?: () => void };
 
 // The doctor basic info form.
-export default function DoctorBasicInfo({ doctor, userId }: DoctorBasicInfoProps) {
+export default function DoctorBasicInfo({ doctor, userId, onSaved }: DoctorBasicInfoProps) {
   const { updateUser } = useAuth();
   const form = useSaveForm();
 
@@ -37,13 +37,11 @@ export default function DoctorBasicInfo({ doctor, userId }: DoctorBasicInfoProps
     form.runSave(async () => {
       const updatedUser = await saveDoctorProfileSection(userId, "basic", values);
       updateUser(updatedUser);
-    });
+    }, onSaved);
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h3 className="font-bold text-ink">Basic info</h3>
-
       {form.errorMessage && <Alert message={form.errorMessage} />}
 
       <FormInput

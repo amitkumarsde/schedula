@@ -8,10 +8,10 @@ import { useSaveForm } from "@/features/profile/hooks/useSaveForm";
 import { savePatientProfileSection } from "@/features/profile/api/patientProfileService";
 import type { Patient } from "@/types";
 
-type PatientEmergencyProps = { patient: Patient; userId: string };
+type PatientEmergencyProps = { patient: Patient; userId: string; onSaved?: () => void };
 
 // The emergency contact and insurance form.
-export default function PatientEmergency({ patient, userId }: PatientEmergencyProps) {
+export default function PatientEmergency({ patient, userId, onSaved }: PatientEmergencyProps) {
   const form = useSaveForm();
   const [values, setValues] = useState({
     emergencyName: patient.emergencyName ?? "",
@@ -31,13 +31,11 @@ export default function PatientEmergency({ patient, userId }: PatientEmergencyPr
     event.preventDefault();
     form.runSave(async () => {
       await savePatientProfileSection(userId, "emergency", values);
-    });
+    }, onSaved);
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h3 className="font-bold text-ink">Emergency contact</h3>
-
       {form.errorMessage && <Alert message={form.errorMessage} />}
 
       <div className="grid gap-4 sm:grid-cols-2">

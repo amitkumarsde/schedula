@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    const doctors = await Doctor.find(filter).sort({ rating: -1 });
+    const doctors = await Doctor.find(filter).select("-notifications -appointments").sort({ rating: -1 });
 
     return sendSuccess({ count: doctors.length, doctors });
   } catch (error) {

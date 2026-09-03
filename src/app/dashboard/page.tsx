@@ -1,5 +1,5 @@
-import DoctorDashboard from "@/features/dashboard/components/DoctorDashboard";
+import Dashboard from "@/features/dashboard/components/Dashboard";
 
 export default function DashboardPage() {
-  return <DoctorDashboard />;
+  return <Dashboard />;
 }

@@ -8,6 +8,7 @@ import FormInput from "@/components/ui/FormInput";
 import Button from "@/components/ui/Button";
 import { signupUser } from "@/features/auth/api/authService";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { EMAIL_PATTERN, isValidFullName, FULL_NAME_MESSAGE } from "@/lib/utils/validation";
 import { toast } from "react-toastify";
 import type { UserRole } from "@/types";
 
@@ -15,9 +16,6 @@ const ROLE_OPTIONS = [
   { value: "patient" as UserRole, label: "I am a Patient", Icon: User },
   { value: "doctor" as UserRole, label: "I am a Doctor", Icon: Stethoscope },
 ];
-
-// The same email check the API uses, so both agree on what is valid.
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // The signup form for a patient or a doctor.
 export default function SignupForm() {
@@ -40,8 +38,8 @@ export default function SignupForm() {
     const cleanEmail = email.trim();
 
     // Checked here too, so the user sees the problem without waiting for the server.
-    if (cleanFullName.length < 3 || cleanFullName.length > 60) {
-      toast.error("Full name must be between 3 and 60 characters");
+    if (!isValidFullName(cleanFullName)) {
+      toast.error(FULL_NAME_MESSAGE);
       return;
     }
 

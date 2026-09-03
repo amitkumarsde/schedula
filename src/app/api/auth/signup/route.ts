@@ -2,13 +2,11 @@ import { NextRequest } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import { sendSuccess, sendError, handleApiError, isDuplicateKeyError } from "@/lib/utils/apiResponse";
 import { readJsonBody, isNonEmptyText } from "@/lib/utils/apiRequest";
+import { EMAIL_PATTERN, isValidFullName, FULL_NAME_MESSAGE } from "@/lib/utils/validation";
 import { toSafeUser } from "@/lib/auth/toSafeUser";
 import User from "@/lib/models/User";
 import Patient from "@/lib/models/Patient";
 import Doctor from "@/lib/models/Doctor";
-
-// A short check for "something@something.something" with no spaces.
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Creates a new account as a patient or a doctor.
 export async function POST(request: NextRequest) {
@@ -29,8 +27,8 @@ export async function POST(request: NextRequest) {
     const cleanFullName = fullName.trim();
     const cleanEmail = email.trim().toLowerCase();
 
-    if (cleanFullName.length < 3 || cleanFullName.length > 60) {
-      return sendError("Full name must be between 3 and 60 characters");
+    if (!isValidFullName(cleanFullName)) {
+      return sendError(FULL_NAME_MESSAGE);
     }
 
     if (!EMAIL_PATTERN.test(cleanEmail)) {
