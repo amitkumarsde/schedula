@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getDoctors } from "@/features/doctors/api/doctorService";
 import type { Doctor } from "@/types";
 
-// Loads the doctors list.
+// Loads the doctors list and tracks loading and error state.
 export function useDoctors(search = "", specialization = "") {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [isLoading, setIsLoading] = useState(true);

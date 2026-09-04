@@ -56,6 +56,7 @@ export default function AppointmentReview({
     );
   }
 
+  // Sends the form to the API when submitted.
   async function handleSubmit() {
     if (rating < 1) {
       toast.error("Please pick a rating");

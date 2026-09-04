@@ -3,7 +3,7 @@
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/lib/auth/AuthContext";
 
-// The call to action section on the home page.
+// Shows the booking call-to-action banner on the home page.
 export default function BookingCallToAction() {
   const { user, isLoading } = useAuth();
 

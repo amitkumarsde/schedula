@@ -17,13 +17,10 @@ export default function AppointmentCard({
 }) {
   const isPatient = viewerRole === "patient";
   const title = isPatient ? appointment.doctor.name : appointment.patient.name;
-  const subtitle = isPatient
-    ? appointment.doctor.specialization
-    : `${appointment.patient.gender}, ${appointment.patient.age}`;
+  const subtitle = isPatient ? appointment.doctor.specialization : `${appointment.patient.gender}, ${appointment.patient.age}`;
   // An upcoming visit whose slot time has passed still needs the doctor to act.
   const needsAction =
-    appointment.status === "upcoming" &&
-    appointmentHasStarted(appointment.appointmentDate, appointment.slotTime);
+    appointment.status === "upcoming" && appointmentHasStarted(appointment.appointmentDate, appointment.slotTime);
 
   return (
     <Link

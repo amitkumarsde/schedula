@@ -1,13 +1,13 @@
 import { apiGet, apiPut } from "@/lib/api/apiClient";
 import type { LoggedInUser, Patient } from "@/types";
 
-// Loads the logged in patient's own profile.
+// Loads one patient's profile by their user id.
 export async function getPatientProfile(userId: string): Promise<Patient | null> {
   const data = await apiGet(`/profile/patient?userId=${encodeURIComponent(userId)}`);
   return data.patientProfile;
 }
 
-// Saves one tab of the patient profile and returns the updated user.
+// Saves one section of the patient's profile to the API.
 export async function savePatientProfileSection(
   userId: string,
   section: string,

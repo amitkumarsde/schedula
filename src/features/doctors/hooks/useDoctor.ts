@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getDoctorById } from "@/features/doctors/api/doctorService";
 import type { Doctor } from "@/types";
 
-// Loads one doctor by id.
+// Loads one doctor by id and tracks loading and error state.
 export function useDoctor(doctorId: string) {
   const [doctor, setDoctor] = useState<Doctor | null>(null);
   const [isLoading, setIsLoading] = useState(true);

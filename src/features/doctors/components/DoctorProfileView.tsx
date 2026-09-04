@@ -9,7 +9,7 @@ import StatTiles from "@/components/ui/StatTiles";
 import { useDoctor } from "@/features/doctors/hooks/useDoctor";
 import { useAuth } from "@/lib/auth/AuthContext";
 
-// Shows one label with its value.
+// Shows one label and value row in the details list.
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4 border-b border-line py-3 last:border-b-0">
@@ -19,7 +19,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-// The public doctor profile page.
+// Shows a single doctor's full profile and booking box.
 export default function DoctorProfileView({ doctorId }: { doctorId: string }) {
   const { doctor, isLoading, errorMessage } = useDoctor(doctorId);
   const { user } = useAuth();

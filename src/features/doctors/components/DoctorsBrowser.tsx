@@ -8,7 +8,7 @@ import DoctorCard from "@/features/doctors/components/DoctorCard";
 import DoctorListSkeleton from "@/features/doctors/components/DoctorListSkeleton";
 import Alert from "@/components/ui/Alert";
 
-// The doctors page with search and specialization filter.
+// Shows the searchable, filterable list of doctors.
 export default function DoctorsBrowser() {
   const router = useRouter();
   const searchParams = useSearchParams();

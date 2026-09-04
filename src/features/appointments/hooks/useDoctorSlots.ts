@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getDoctorSlots } from "@/features/appointments/api/appointmentService";
 import type { Slot } from "@/types";
 
-// Loads the slots for a doctor on the chosen date.
+// Loads the slots for one doctor on a date.
 export function useDoctorSlots(doctorId: string, date: string) {
   const [slots, setSlots] = useState<Slot[]>([]);
   const [isWorkingDay, setIsWorkingDay] = useState(true);

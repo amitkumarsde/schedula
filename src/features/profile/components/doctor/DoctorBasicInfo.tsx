@@ -8,7 +8,7 @@ import SaveButton from "@/features/profile/components/SaveButton";
 import { useSaveForm } from "@/features/profile/hooks/useSaveForm";
 import { saveDoctorProfileSection } from "@/features/profile/api/doctorProfileService";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { DOCTOR_GENDER_OPTIONS } from "@/lib/utils/profileOptions";
+import { GENDER_OPTIONS } from "@/lib/utils/profileOptions";
 import type { Doctor } from "@/types";
 
 type DoctorBasicInfoProps = { doctor: Doctor; userId: string; onSaved?: () => void };
@@ -68,7 +68,7 @@ export default function DoctorBasicInfo({ doctor, userId, onSaved }: DoctorBasic
           name="gender"
           value={values.gender}
           onChange={(value) => setField("gender", value)}
-          options={DOCTOR_GENDER_OPTIONS}
+          options={GENDER_OPTIONS}
           placeholder="Select gender"
           required
         />

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getDoctorProfile } from "@/features/profile/api/doctorProfileService";
 import type { Doctor } from "@/types";
 
-// Loads the logged in doctor's profile.
+// Loads the logged in doctor's own profile.
 export function useDoctorProfile(userId: string) {
   const [doctorProfile, setDoctorProfile] = useState<Doctor | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -15,7 +15,7 @@ export function useDoctorProfile(userId: string) {
     if (!userId) return;
     let isCurrentRequest = true;
 
-    // Fetches the profile from the API.
+    // Fetches the doctor profile from the API.
     async function loadProfile() {
       setIsLoading(true);
       setErrorMessage("");
@@ -39,7 +39,7 @@ export function useDoctorProfile(userId: string) {
     };
   }, [userId, reloadCount]);
 
-  // Loads the profile again after a save.
+  // Loads the profile again.
   function reloadProfile() {
     setReloadCount((current) => current + 1);
   }

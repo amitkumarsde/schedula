@@ -3,10 +3,10 @@ import { connectToDatabase } from "@/lib/db";
 import { sendSuccess, sendError, handleApiError } from "@/lib/utils/apiResponse";
 import { readJsonBody, isNonEmptyText, readOptionalText } from "@/lib/utils/apiRequest";
 import { toSafeUser } from "@/lib/auth/toSafeUser";
+import { findUserWithRole } from "@/lib/auth/findUserWithRole";
 import { CheckResult } from "@/lib/profile/checkResult";
 import { validatePatientBasic, validatePatientMedical, validatePatientEmergency } from "@/lib/profile/validatePatientProfile";
 import { validateFileLinks } from "@/lib/profile/validateFileLinks";
-import User from "@/lib/models/User";
 import Patient from "@/lib/models/Patient";
 
 const SAVE_OPTIONS = { new: true, runValidators: true };
@@ -29,9 +29,8 @@ export async function GET(request: NextRequest) {
 
     await connectToDatabase();
 
-    const user = await User.findById(userId);
-    if (!user) return sendError("User not found", 404);
-    if (user.role !== "patient") return sendError("This user is not a patient", 403);
+    const found = await findUserWithRole(userId, "patient");
+    if (found.error) return found.error;
 
     const patientProfile = await Patient.findOne({ userId });
     return sendSuccess({ patientProfile });
@@ -53,9 +52,9 @@ export async function PUT(request: NextRequest) {
 
     await connectToDatabase();
 
-    const user = await User.findById(body.userId);
-    if (!user) return sendError("User not found", 404);
-    if (user.role !== "patient") return sendError("This user is not a patient", 403);
+    const found = await findUserWithRole(body.userId, "patient");
+    if (found.error) return found.error;
+    const user = found.user;
 
     const result = checkPatientSection(section, body);
     if (!result) return sendError("Unknown profile section");

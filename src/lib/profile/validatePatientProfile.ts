@@ -1,5 +1,5 @@
 import { readOptionalText } from "@/lib/utils/apiRequest";
-import { MOBILE_NUMBER_PATTERN, PATIENT_GENDER_OPTIONS, BLOOD_GROUPS } from "@/lib/utils/profileOptions";
+import { MOBILE_NUMBER_PATTERN, GENDER_OPTIONS, BLOOD_GROUPS } from "@/lib/utils/profileOptions";
 import { isValidFullName, FULL_NAME_MESSAGE, isHttpsUrl } from "@/lib/utils/validation";
 import { CheckResult, fail, ok } from "@/lib/profile/checkResult";
 
@@ -24,7 +24,7 @@ export function validatePatientBasic(body: Record<string, unknown>): CheckResult
     return fail("Age must be a whole number between 1 and 120");
   }
 
-  const allowedGenders = PATIENT_GENDER_OPTIONS.map((option) => option.value);
+  const allowedGenders = GENDER_OPTIONS.map((option) => option.value);
   if (!allowedGenders.includes(gender)) {
     return fail("Please select male, female or other as gender");
   }
@@ -37,7 +37,6 @@ export function validatePatientBasic(body: Record<string, unknown>): CheckResult
     return fail("Weight must be between 1 and 500 Kg");
   }
 
-  // Height is optional, but must be sensible when given.
   if (Number.isFinite(height) && height > 0 && (height < 30 || height > 300)) {
     return fail("Height must be between 30 and 300 cm");
   }

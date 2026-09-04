@@ -5,14 +5,24 @@ import { Move, X } from "lucide-react";
 import { formatSlotLabel, formatLongDate, appointmentHasStarted } from "@/lib/utils/schedule";
 import type { Appointment, UserRole } from "@/types";
 
-// The calendar shows only upcoming and completed appointments.
-type ShownStatus = "upcoming" | "completed";
+// The calendar shows every booked slot except cancelled ones.
+// "pending" is an upcoming visit whose slot time has passed and still needs the doctor.
+type SlotStatus = "upcoming" | "pending" | "completed" | "missed";
 
 // Soft colours so each status is easy to tell apart at a glance.
-const STATUS_STYLE: Record<ShownStatus, string> = {
+const STATUS_STYLE: Record<SlotStatus, string> = {
   upcoming: "border-brand bg-brand-soft text-ink",
+  pending: "border-warning bg-warning-soft text-ink",
   completed: "border-success bg-success-soft text-ink",
+  missed: "border-line bg-surface text-muted",
 };
+
+// The colour a booked slot is shown in, based on its status and whether its time has passed.
+function slotStatus(appointment: Appointment): SlotStatus {
+  if (appointment.status === "completed") return "completed";
+  if (appointment.status === "missed") return "missed";
+  return appointmentHasStarted(appointment.appointmentDate, appointment.slotTime) ? "pending" : "upcoming";
+}
 
 type DayCalendarProps = {
   selectedDate: string;
@@ -70,11 +80,8 @@ export default function DayCalendar({
 
       <div className="thin-scrollbar mt-3 grid max-h-[30rem] grid-cols-3 gap-2 overflow-y-auto pr-1">
         {times.map((time) => {
-          // Only upcoming and completed appointments hold a slot here.
-          const appointment = (appointmentsByTime[time] ?? []).find(
-            (one): one is Appointment & { status: ShownStatus } =>
-              one.status === "upcoming" || one.status === "completed"
-          );
+          // A cancelled slot is free again; any other booking holds the slot.
+          const appointment = (appointmentsByTime[time] ?? []).find((one) => one.status !== "cancelled");
 
           // A free slot is a drop target.
           if (!appointment) {
@@ -126,7 +133,7 @@ export default function DayCalendar({
                 }
                 onOpenDetail(appointment._id);
               }}
-              className={`cursor-pointer rounded-xl border p-2 transition-colors ${STATUS_STYLE[appointment.status]} ${
+              className={`cursor-pointer rounded-xl border p-2 transition-colors ${STATUS_STYLE[slotStatus(appointment)]} ${
                 isPicked ? "ring-2 ring-brand" : ""
               }`}
             >

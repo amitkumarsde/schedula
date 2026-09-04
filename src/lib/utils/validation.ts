@@ -4,8 +4,8 @@
 export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Full name length rule, used at signup and in both profile checks.
-export const FULL_NAME_MIN = 3;
-export const FULL_NAME_MAX = 30;
+const FULL_NAME_MIN = 3;
+const FULL_NAME_MAX = 30;
 export const FULL_NAME_MESSAGE = `Full name must be between ${FULL_NAME_MIN} and ${FULL_NAME_MAX} characters`;
 
 export function isValidFullName(value: string): boolean {

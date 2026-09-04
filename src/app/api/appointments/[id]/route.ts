@@ -3,8 +3,8 @@ import { connectToDatabase } from "@/lib/db";
 import { sendSuccess, sendError, handleApiError } from "@/lib/utils/apiResponse";
 import { readJsonBody, isNonEmptyText, readOptionalText } from "@/lib/utils/apiRequest";
 import {
-  makeSlots,
-  weekdayName,
+  makeSlotsForDoctor,
+  isDoctorWorkingOn,
   appointmentHasStarted,
   formatLongDate,
   formatSlotLabel,
@@ -34,20 +34,21 @@ function cleanMedicines(value: unknown) {
 
 type NotificationType = "reschedule" | "cancel" | "patient-cancel" | "missed" | "complete";
 
-// Adds one notification to a patient profile (found by their user id).
-async function notifyPatient(userId: unknown, message: string, type: NotificationType, appointmentId: unknown) {
-  await Patient.updateOne(
-    { userId: String(userId) },
-    { $push: { notifications: { message, type, appointmentId: String(appointmentId), isRead: false } } }
-  );
-}
-
-// Adds one notification to a doctor profile (found by their user id).
-async function notifyDoctor(userId: unknown, message: string, type: NotificationType, appointmentId: unknown) {
-  await Doctor.updateOne(
-    { userId: String(userId) },
-    { $push: { notifications: { message, type, appointmentId: String(appointmentId), isRead: false } } }
-  );
+// Adds one notification to a patient or doctor profile (found by their user id).
+async function notify(
+  target: "patient" | "doctor",
+  userId: unknown,
+  message: string,
+  type: NotificationType,
+  appointmentId: unknown
+) {
+  const filter = { userId: String(userId) };
+  const update = { $push: { notifications: { message, type, appointmentId: String(appointmentId), isRead: false } } };
+  if (target === "doctor") {
+    await Doctor.updateOne(filter, update);
+  } else {
+    await Patient.updateOne(filter, update);
+  }
 }
 
 // Returns one appointment (with doctor and patient details) for the people on it.
@@ -107,16 +108,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       if (!isDoctor) return sendError("Only the doctor can reschedule an appointment", 403);
       if (!doctorProfile) return sendError("Doctor not found", 404);
 
-      if (!doctorProfile.isAvailable || !doctorProfile.availableDays.includes(weekdayName(appointmentDate))) {
+      if (!isDoctorWorkingOn(doctorProfile, appointmentDate)) {
         return sendError("You do not consult on this day");
       }
 
-      const slots = makeSlots(
-        doctorProfile.startTime,
-        doctorProfile.endTime,
-        doctorProfile.slotDuration,
-        doctorProfile.breakDuration
-      );
+      const slots = makeSlotsForDoctor(doctorProfile);
       if (!slots.includes(slotTime)) return sendError("This time slot is not available");
 
       if (appointmentHasStarted(appointmentDate, slotTime)) {
@@ -137,7 +133,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       await appointment.save();
 
       // Tell the other person about the new time.
-      await notifyPatient(
+      await notify("patient",
         appointment.patientUserId,
         `${doctorName} rescheduled appointment #${appointment.appointmentNumber} to ${when()}.`,
         "reschedule",
@@ -186,10 +182,10 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         const message = `${cancelledBy} cancelled appointment #${appointment.appointmentNumber} (${when()}).`;
         if (isDoctor) {
           // Doctor cancelled: the patient sees a red cancel notification.
-          await notifyPatient(appointment.patientUserId, message, "cancel", appointment._id);
+          await notify("patient", appointment.patientUserId, message, "cancel", appointment._id);
         } else {
           // Patient cancelled: the doctor sees a blue notification.
-          await notifyDoctor(appointment.doctorUserId, message, "patient-cancel", appointment._id);
+          await notify("doctor", appointment.doctorUserId, message, "patient-cancel", appointment._id);
         }
 
         return sendSuccess({ message: "Appointment cancelled", appointment });
@@ -206,7 +202,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         appointment.status = "missed";
         await appointment.save();
 
-        await notifyPatient(
+        await notify("patient",
           appointment.patientUserId,
           `${doctorName} marked appointment #${appointment.appointmentNumber} (${when()}) as missed.`,
           "missed",
@@ -224,7 +220,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       appointment.status = "completed";
       await appointment.save();
 
-      await notifyPatient(
+      await notify("patient",
         appointment.patientUserId,
         `${doctorName} completed appointment #${appointment.appointmentNumber} (${when()}).`,
         "complete",

@@ -10,14 +10,16 @@ import { rescheduleAppointment } from "@/features/appointments/api/appointmentSe
 import AppCalendar from "@/components/ui/AppCalendar";
 import SummaryCard from "@/components/ui/SummaryCard";
 import DayCalendar from "@/features/appointments/components/DayCalendar";
-import { makeSlots, weekdayName, todayDateText } from "@/lib/utils/schedule";
+import { makeSlotsForDoctor, weekdayName, todayDateText } from "@/lib/utils/schedule";
 import { toast } from "react-toastify";
 import type { Appointment } from "@/types";
 
 // The colour key shown under the calendar.
 const LEGEND = [
   { label: "Upcoming", dotClass: "bg-brand" },
+  { label: "Action required", dotClass: "bg-warning" },
   { label: "Completed", dotClass: "bg-success" },
+  { label: "Missed", dotClass: "bg-muted" },
 ];
 
 // The doctor's home: stats on top, then the appointment calendar with reschedule.
@@ -61,10 +63,10 @@ export default function DoctorDashboard() {
     { Icon: Users, label: "Total patients", value: totalPatients },
   ];
 
-  // Count only upcoming and completed appointments on each date, to match the calendar.
+  // Count every booked appointment except cancelled ones, to match the calendar.
   const countsByDate: Record<string, number> = {};
   for (const appointment of appointments) {
-    if (appointment.status !== "upcoming" && appointment.status !== "completed") continue;
+    if (appointment.status === "cancelled") continue;
     countsByDate[appointment.appointmentDate] = (countsByDate[appointment.appointmentDate] ?? 0) + 1;
   }
 
@@ -77,15 +79,7 @@ export default function DoctorDashboard() {
 
   // The time slots come from the doctor's own profile.
   const isWorkingDay = doctorProfile ? doctorProfile.availableDays.includes(weekdayName(selectedDate)) : false;
-  const slotTimes =
-    isWorkingDay && doctorProfile
-      ? makeSlots(
-          doctorProfile.startTime,
-          doctorProfile.endTime,
-          doctorProfile.slotDuration,
-          doctorProfile.breakDuration
-        )
-      : [];
+  const slotTimes = isWorkingDay && doctorProfile ? makeSlotsForDoctor(doctorProfile) : [];
   const times = Array.from(new Set([...slotTimes, ...dayAppointments.map((a) => a.slotTime)])).sort();
 
   // Moves one appointment to the selected day and the chosen time.

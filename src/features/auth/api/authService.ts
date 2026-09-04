@@ -12,7 +12,7 @@ export async function signupUser(
   return data.user;
 }
 
-// Checks the login and returns the user.
+// Logs the user in and returns the user.
 export async function loginUser(email: string, password: string): Promise<LoggedInUser> {
   const data = await apiPost("/auth/login", { email, password });
   return data.user;

@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import { sendSuccess, sendError, handleApiError } from "@/lib/utils/apiResponse";
-import { makeSlots, weekdayName, appointmentHasStarted } from "@/lib/utils/schedule";
+import { makeSlotsForDoctor, isDoctorWorkingOn, appointmentHasStarted } from "@/lib/utils/schedule";
 import Doctor from "@/lib/models/Doctor";
 import Appointment from "@/lib/models/Appointment";
 
@@ -18,19 +18,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const doctor = await Doctor.findById(id);
     if (!doctor) return sendError("Doctor not found", 404);
 
-    // The doctor works this day only if it is one of their chosen days and booking is on.
-    const isWorkingDay = doctor.isAvailable && doctor.availableDays.includes(weekdayName(date));
-
-    if (!isWorkingDay) {
+    if (!isDoctorWorkingOn(doctor, date)) {
       return sendSuccess({ date, isWorkingDay: false, slots: [] });
     }
 
-    const slotTimes = makeSlots(
-      doctor.startTime,
-      doctor.endTime,
-      doctor.slotDuration,
-      doctor.breakDuration
-    );
+    const slotTimes = makeSlotsForDoctor(doctor);
 
     // A slot is taken if an appointment already holds it and was not cancelled.
     const booked = await Appointment.find({

@@ -3,7 +3,7 @@
 import { formatSlotLabel } from "@/lib/utils/schedule";
 import type { Slot } from "@/types";
 
-// Shows all the day's slots in one continuous grid.
+// A grid of time slots the patient can pick from.
 export default function SlotPicker({
   slots,
   selectedSlot,

@@ -7,7 +7,7 @@ import DoctorListSkeleton from "@/features/doctors/components/DoctorListSkeleton
 
 const HOW_MANY_TO_SHOW = 3;
 
-// Shows the top doctors on the home page.
+// Shows the top rated doctors on the home page.
 export default function FeaturedDoctors() {
   const { doctors, isLoading, errorMessage } = useDoctors();
 

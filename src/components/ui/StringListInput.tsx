@@ -30,7 +30,6 @@ export default function StringListInput({
     setNewItem("");
   }
 
-  // Removes one item by its position in the list.
   function removeItem(indexToRemove: number) {
     onChange(items.filter((_, index) => index !== indexToRemove));
   }

@@ -24,7 +24,7 @@ const TABS: ProfileTab[] = [
   { key: "cancelled", label: "Cancelled", Icon: Ban },
 ];
 
-// The appointments page with a tab for each status.
+// The list of the user's appointments, grouped by date with status tabs.
 export default function AppointmentList() {
   const { user, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();

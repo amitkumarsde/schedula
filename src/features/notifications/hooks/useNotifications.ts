@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getNotifications } from "@/features/notifications/api/notificationService";
 import type { Notification } from "@/types";
 
-// Loads the logged in user's notifications and can reload them.
+// Loads the user's notifications and keeps the unread count.
 export function useNotifications(userId: string) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);

@@ -14,7 +14,7 @@ const STATUS_LABEL: Record<AppointmentStatus, string> = {
   cancelled: "Cancelled",
 };
 
-// A small coloured badge for the appointment status.
+// A small coloured badge showing the appointment status.
 export default function AppointmentStatusBadge({ status }: { status: AppointmentStatus }) {
   return (
     <span

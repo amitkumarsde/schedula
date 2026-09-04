@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getMyAppointments } from "@/features/appointments/api/appointmentService";
 import type { Appointment } from "@/types";
 
-// Loads the logged in user's appointments.
+// Loads all appointments for one user.
 export function useMyAppointments(userId: string) {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);

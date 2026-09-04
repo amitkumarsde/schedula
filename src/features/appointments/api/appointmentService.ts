@@ -1,7 +1,7 @@
 import { apiGet, apiPost, apiPatch } from "@/lib/api/apiClient";
 import type { Appointment, AppointmentStatus, Slot, Medicine } from "@/types";
 
-// Loads the time slots for one doctor on one date.
+// Loads the slots for one doctor on a date.
 export async function getDoctorSlots(
   doctorId: string,
   date: string
@@ -25,7 +25,7 @@ export async function bookAppointment(payload: {
   return data.appointment;
 }
 
-// Loads the logged in user's appointments.
+// Loads all appointments for one user.
 export async function getMyAppointments(userId: string): Promise<Appointment[]> {
   const data = await apiGet(`/appointments?userId=${userId}`);
   return data.appointments;
@@ -37,7 +37,7 @@ export async function getAppointment(appointmentId: string, userId: string): Pro
   return data.appointment;
 }
 
-// Changes an appointment status, like cancel or complete.
+// Updates the status of one appointment.
 export async function updateAppointmentStatus(
   appointmentId: string,
   userId: string,
@@ -47,7 +47,7 @@ export async function updateAppointmentStatus(
   return data.appointment;
 }
 
-// The doctor saves the prescription (diagnosis, instructions and medicines).
+// Saves the prescription for one appointment.
 export async function savePrescription(
   appointmentId: string,
   userId: string,
@@ -57,7 +57,7 @@ export async function savePrescription(
   return data.appointment;
 }
 
-// The patient saves a review (rating and comment) for a completed appointment.
+// Saves the patient's review for one appointment.
 export async function saveReview(
   appointmentId: string,
   userId: string,

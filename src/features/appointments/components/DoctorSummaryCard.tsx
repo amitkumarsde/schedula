@@ -7,7 +7,7 @@ type DoctorSummaryCardProps = {
   imageUrl: string;
 };
 
-// A small doctor card used on the booking and appointment pages.
+// A small card showing the doctor's name and details.
 export default function DoctorSummaryCard({
   name,
   specialization,

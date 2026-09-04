@@ -14,7 +14,9 @@ import type { Appointment } from "@/types";
 // The colour key shown under the calendar.
 const LEGEND = [
   { label: "Upcoming", dotClass: "bg-brand" },
+  { label: "Awaiting doctor", dotClass: "bg-warning" },
   { label: "Completed", dotClass: "bg-success" },
+  { label: "Missed", dotClass: "bg-muted" },
 ];
 
 // The patient's home: stats on top, then a read-only calendar of their appointments.
@@ -45,8 +47,8 @@ export default function PatientDashboard() {
     { Icon: CalendarDays, label: "Total appointments", value: appointments.length },
   ];
 
-  // The calendar shows only upcoming and completed appointments.
-  const shown = appointments.filter((one) => one.status === "upcoming" || one.status === "completed");
+  // The calendar shows every booked appointment except cancelled ones.
+  const shown = appointments.filter((one) => one.status !== "cancelled");
 
   const countsByDate: Record<string, number> = {};
   for (const appointment of shown) {
@@ -73,7 +75,7 @@ export default function PatientDashboard() {
       </div>
 
       <h2 className="mt-10 text-lg font-bold text-ink">Appointment calendar</h2>
-      <p className="mt-1 text-sm text-muted">Your upcoming and completed appointments.</p>
+      <p className="mt-1 text-sm text-muted">Your booked appointments.</p>
 
       {isLoading ? (
         <div className="mt-4 h-96 animate-pulse rounded-2xl bg-surface" />

@@ -1,4 +1,4 @@
-// Shows one label with its value.
+// Shows one labelled read-only value on the profile.
 export default function ProfileField({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0">

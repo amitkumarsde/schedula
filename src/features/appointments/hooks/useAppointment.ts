@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getAppointment } from "@/features/appointments/api/appointmentService";
 import type { Appointment } from "@/types";
 
-// Loads one appointment and can reload it.
+// Loads one appointment and lets the page reload it.
 export function useAppointment(appointmentId: string, userId: string) {
   const [appointment, setAppointment] = useState<Appointment | null>(null);
   const [isLoading, setIsLoading] = useState(true);

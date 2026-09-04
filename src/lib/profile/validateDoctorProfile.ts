@@ -1,5 +1,5 @@
 import { readOptionalText } from "@/lib/utils/apiRequest";
-import { MOBILE_NUMBER_PATTERN, DOCTOR_GENDER_OPTIONS, WEEK_DAYS, SLOT_DURATIONS, BREAK_DURATIONS } from "@/lib/utils/profileOptions";
+import { MOBILE_NUMBER_PATTERN, GENDER_OPTIONS, WEEK_DAYS, SLOT_DURATIONS, BREAK_DURATIONS } from "@/lib/utils/profileOptions";
 import { isValidFullName, FULL_NAME_MESSAGE, isHttpsUrl } from "@/lib/utils/validation";
 import { SPECIALIZATIONS } from "@/lib/utils/specializations";
 import { VISIT_TYPES, MEET_TYPES, CONSULT_TYPES } from "@/lib/utils/appointmentOptions";
@@ -20,9 +20,9 @@ export function validateDoctorBasic(body: Record<string, unknown>): CheckResult 
     return fail(FULL_NAME_MESSAGE);
   }
 
-  const allowedGenders = DOCTOR_GENDER_OPTIONS.map((option) => option.value);
+  const allowedGenders = GENDER_OPTIONS.map((option) => option.value);
   if (!allowedGenders.includes(gender)) {
-    return fail("Please select male or female as gender");
+    return fail("Please select male, female or other as gender");
   }
 
   if (!MOBILE_NUMBER_PATTERN.test(mobileNumber)) {

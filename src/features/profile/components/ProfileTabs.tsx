@@ -14,7 +14,7 @@ type ProfileTabsProps = {
   onSelect: (key: string) => void;
 };
 
-// The row of tabs on the profile page.
+// The row of tabs across the top of the profile.
 export default function ProfileTabs({ tabs, activeKey, onSelect }: ProfileTabsProps) {
   return (
     <div className="no-scrollbar flex gap-1 overflow-x-auto rounded-xl border border-line bg-surface p-1">

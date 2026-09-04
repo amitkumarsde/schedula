@@ -18,7 +18,7 @@ const STEPS = [
   },
 ];
 
-// The three steps section on the home page.
+// Shows the three-step how it works section on the home page.
 export default function HowItWorks() {
   return (
     <section className="bg-surface">

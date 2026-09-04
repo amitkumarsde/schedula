@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import { sendSuccess, sendError, handleApiError, isDuplicateKeyError } from "@/lib/utils/apiResponse";
 import { readJsonBody, isNonEmptyText, readOptionalText } from "@/lib/utils/apiRequest";
-import { makeSlots, weekdayName, appointmentHasStarted } from "@/lib/utils/schedule";
+import { makeSlotsForDoctor, isDoctorWorkingOn, appointmentHasStarted } from "@/lib/utils/schedule";
 import { VISIT_TYPES, MEET_TYPES, CONSULT_TYPES } from "@/lib/utils/appointmentOptions";
 import User from "@/lib/models/User";
 import Doctor from "@/lib/models/Doctor";
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     const doctor = await Doctor.findById(doctorId);
     if (!doctor) return sendError("Doctor not found", 404);
 
-    if (!doctor.isAvailable || !doctor.availableDays.includes(weekdayName(appointmentDate))) {
+    if (!isDoctorWorkingOn(doctor, appointmentDate)) {
       return sendError("The doctor is not available on this day");
     }
 
@@ -92,12 +92,7 @@ export async function POST(request: NextRequest) {
     }
 
     // The chosen slot must be a real slot from the doctor's timings.
-    const allSlots = makeSlots(
-      doctor.startTime,
-      doctor.endTime,
-      doctor.slotDuration,
-      doctor.breakDuration
-    );
+    const allSlots = makeSlotsForDoctor(doctor);
     if (!allSlots.includes(slotTime)) {
       return sendError("This time slot is not available");
     }

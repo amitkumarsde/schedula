@@ -8,7 +8,7 @@ import SaveButton from "@/features/profile/components/SaveButton";
 import { useSaveForm } from "@/features/profile/hooks/useSaveForm";
 import { savePatientProfileSection } from "@/features/profile/api/patientProfileService";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { BLOOD_GROUPS, PATIENT_GENDER_OPTIONS } from "@/lib/utils/profileOptions";
+import { BLOOD_GROUPS, GENDER_OPTIONS } from "@/lib/utils/profileOptions";
 import type { Patient } from "@/types";
 
 type PatientBasicInfoProps = { patient: Patient; userId: string; onSaved?: () => void };
@@ -88,7 +88,7 @@ export default function PatientBasicInfo({ patient, userId, onSaved }: PatientBa
           name="gender"
           value={values.gender}
           onChange={(value) => setField("gender", value)}
-          options={PATIENT_GENDER_OPTIONS}
+          options={GENDER_OPTIONS}
           placeholder="Select gender"
           required
         />

@@ -36,6 +36,16 @@ export function makeSlots(
   return slots;
 }
 
+// Builds the slots straight from a doctor's saved timings.
+export function makeSlotsForDoctor(doctor: {
+  startTime: string;
+  endTime: string;
+  slotDuration: number;
+  breakDuration: number;
+}): string[] {
+  return makeSlots(doctor.startTime, doctor.endTime, doctor.slotDuration, doctor.breakDuration);
+}
+
 export function formatSlotLabel(time: string) {
   const [hours, minutes] = time.split(":").map(Number);
   const period = hours < 12 ? "AM" : "PM";
@@ -46,6 +56,14 @@ export function formatSlotLabel(time: string) {
 export function weekdayName(dateText: string) {
   const [year, month, day] = dateText.split("-").map(Number);
   return WEEKDAYS[new Date(year, month - 1, day).getDay()];
+}
+
+// True when the doctor takes bookings and this date is one of their days.
+export function isDoctorWorkingOn(
+  doctor: { isAvailable: boolean; availableDays: string[] },
+  dateText: string
+) {
+  return doctor.isAvailable && doctor.availableDays.includes(weekdayName(dateText));
 }
 
 export function formatLongDate(dateText: string) {

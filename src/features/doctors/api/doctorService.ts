@@ -1,7 +1,7 @@
 import { apiGet } from "@/lib/api/apiClient";
 import type { Doctor } from "@/types";
 
-// Loads the doctors list with optional search and filter.
+// Loads the doctors list, optionally filtered by search and specialization.
 export async function getDoctors(search = "", specialization = ""): Promise<Doctor[]> {
   const query = new URLSearchParams();
 

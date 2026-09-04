@@ -42,7 +42,7 @@ export default function FileLinksSection({ links, userId, section, onSaved }: Fi
     setNewUrl("");
   }
 
-  // Removes one link by its position in the list.
+  // Removes one link from the list by its position.
   function removeLink(indexToRemove: number) {
     setDraftLinks(draftLinks.filter((_, index) => index !== indexToRemove));
   }

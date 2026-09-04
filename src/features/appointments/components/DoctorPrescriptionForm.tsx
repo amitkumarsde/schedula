@@ -47,10 +47,12 @@ export default function DoctorPrescriptionForm({
     setMedicines(medicines.map((one, i) => (i === index ? { ...one, [field]: value } : one)));
   }
 
+  // Adds one empty medicine row.
   function addMedicine() {
     setMedicines([...medicines, { ...EMPTY_MEDICINE }]);
   }
 
+  // Removes one medicine row.
   function removeMedicine(index: number) {
     setMedicines(medicines.filter((_, i) => i !== index));
   }
