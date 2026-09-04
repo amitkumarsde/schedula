@@ -24,28 +24,32 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// Saves the question, asks the assistant, then saves and returns the reply.
+// Asks the assistant and returns the reply. A logged in user's chat is also saved.
 export async function POST(request: NextRequest) {
   try {
     const body = await readJsonBody(request);
     if (!body) return sendError("Please send the details as a JSON object");
 
     const { userId, message } = body;
-    if (!isNonEmptyText(userId)) return sendError("Please log in to use the chat", 401);
     if (!isNonEmptyText(message)) return sendError("Please type a message");
 
-    await connectToDatabase();
-
-    const user = await User.findById(userId);
-    if (!user) return sendError("Please log in to use the chat", 401);
-
     const question = message.trim().slice(0, 1000);
-    await ChatMessage.create({ userId, role: "user", text: question });
 
+    // A logged in user's chat is saved to the database.
+    if (isNonEmptyText(userId)) {
+      await connectToDatabase();
+      const user = await User.findById(userId);
+      if (user) {
+        await ChatMessage.create({ userId, role: "user", text: question });
+        const answer = await askAssistant(question);
+        const reply = await ChatMessage.create({ userId, role: "assistant", text: answer });
+        return sendSuccess({ reply });
+      }
+    }
+
+    // A guest just gets an answer, nothing is saved.
     const answer = await askAssistant(question);
-    const reply = await ChatMessage.create({ userId, role: "assistant", text: answer });
-
-    return sendSuccess({ reply });
+    return sendSuccess({ reply: { role: "assistant", text: answer } });
   } catch (error) {
     return handleApiError(error);
   }

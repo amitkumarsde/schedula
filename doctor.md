@@ -11,11 +11,12 @@ This file lists **what a doctor can do in Schedula** and **which files make it w
   - **Availability** — consulting days, start and end time, slot length, break between slots, fee, the visit / meet / consult types offered, and a **"Show me on the doctors list"** switch.
 - **Show up in the list.** A doctor appears at `/doctors` only when the specialization is filled, the switch is on, start and end times are set, and there is at least one of each option type.
 - **Get booked.** Patients pick a date, a free slot, and only the option types the doctor offers. Taken or past slots are greyed out, so a time is never booked twice.
-- **See the dashboard.** `/dashboard` shows the day's numbers (today's patients, upcoming, completed, total patients), a month calendar with a count on each day, and a day calendar of the slots.
+- **See the dashboard.** `/dashboard` shows the day's numbers (today's patients, upcoming, completed, total patients), a month calendar with a count on each day, a day calendar of the slots, and a link to the prescriptions page.
 - **Read the calendar colours.** On the day calendar each slot shows its status: upcoming (blue), action required (orange, time passed but not finished), completed (green) and missed (gray).
 - **Reschedule.** Drag an upcoming appointment onto a free slot, or use its move icon to pick any day and slot. The patient gets a notification with the new time.
-- **See appointments.** `/appointments` has **All, Upcoming, Completed, Missed and Cancelled** tabs, grouped by date. The detail page shows the patient's details with the appointment.
-- **Write a prescription.** After the visit time, add the diagnosis, medicines (name, dosage, duration) and instructions, then mark the visit completed. It can be edited later.
+- **See appointments.** `/appointments` has **All, Upcoming, Completed, Missed and Cancelled** tabs, grouped by date. Upcoming visits show a countdown like "Today" or "In 3 days". The detail page shows the patient's details with the appointment.
+- **Write a prescription.** After the visit time, add a diagnosis, medicines (name, dosage, duration) and instructions, then mark the visit completed. A diagnosis is optional, so a simple visit can be completed with just instructions (or nothing). It can be edited later.
+- **Manage prescriptions.** The **Prescriptions** page (opened from the dashboard) lists your completed visits that have a diagnosis or medicines, so you can open one and manage the diagnosis, medicines and instructions. Visits with only instructions are not listed.
 - **Cancel or mark missed.** Cancel an upcoming appointment, or mark it missed after the time if the patient did not come. The patient gets a notification.
 - **Notifications.** The header bell shows unread updates, like when a patient cancels.
 - **Chat assistant.** A chat button answers "how do I..." questions about using Schedula (see [chatbot.md](chatbot.md)).
@@ -35,6 +36,7 @@ src/
 │   ├── doctors/page.tsx                         Public doctors list page
 │   ├── doctors/[id]/page.tsx                    Public doctor profile page
 │   ├── dashboard/page.tsx                       The dashboard route
+│   ├── prescriptions/page.tsx                   The prescriptions route
 │   └── profile/doctor/page.tsx                  The doctor profile page route
 ├── components/ui/AppCalendar.tsx                The month calendar (react-calendar)
 ├── features/
@@ -50,7 +52,8 @@ src/
 │   ├── dashboard/components/DoctorDashboard.tsx Numbers + both calendars
 │   ├── appointments/components/
 │   │   ├── DayCalendar.tsx                      The slots of one day
-│   │   └── DoctorPrescriptionForm.tsx           Write the prescription and finish
+│   │   ├── DoctorPrescriptionForm.tsx           Write the prescription and finish
+│   │   └── PrescriptionList.tsx                 Completed visits with a prescription
 │   └── profile/
 │       ├── api/doctorProfileService.ts          Calls the doctor profile API
 │       ├── hooks/useDoctorProfile.ts            Loads the doctor profile
@@ -65,7 +68,7 @@ src/
 ├── lib/
 │   ├── models/Doctor.ts                         The doctor database shape
 │   ├── profile/validateDoctorProfile.ts         Server checks for the doctor parts
-│   └── utils/schedule.ts                        Makes the time slots
+│   └── utils/schedule.ts                        Time slots and date helpers
 └── types/doctor.ts                              The doctor TypeScript type
 ```
 
@@ -80,5 +83,6 @@ src/
 | My appointments | `src/features/appointments/components/AppointmentList.tsx` |
 | One appointment | `src/features/appointments/components/AppointmentDetail.tsx` |
 | Write a prescription | `src/features/appointments/components/DoctorPrescriptionForm.tsx` |
+| Prescriptions | `src/features/appointments/components/PrescriptionList.tsx` |
 | Notifications | `src/features/notifications/components/NotificationList.tsx` |
 | How patients see me | `src/features/doctors/components/DoctorProfileView.tsx` |

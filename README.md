@@ -31,6 +31,121 @@ Schedula is a doctor appointment booking app.
 - A notifications bell shows updates like reschedule, cancel, complete and missed.
 - An AI chat assistant answers "how do I..." questions about using the app.
 
+## Home page
+
+The first page anyone sees. It introduces the app and shows the top doctors.
+
+### Features
+
+- A hero with a search box that opens the doctors page.
+- Cards for the top rated doctors.
+- A short "how it works" section.
+- A button to start booking.
+
+## Login and Signup page
+
+Where a person makes an account or logs in as a patient or a doctor.
+
+### Features
+
+- Sign up as a patient or a doctor (name, email, password, role).
+- Log in with email and password.
+- Show or hide the password.
+- The logged in user is kept in the browser.
+
+## Doctors page
+
+The list of doctors a patient can look through, search and filter.
+
+### Features
+
+- Search by doctor name, specialization or city.
+- Filter by a specialization chip.
+- Save a doctor with the heart, and a "Saved" toggle to show only saved ones.
+- Each card opens the doctor's profile.
+
+## Doctor profile page
+
+One doctor's public page with their details and a way to book.
+
+### Features
+
+- Photo, about, specialization, experience, hospital and fee.
+- Consulting days, times and slot length.
+- A "Book appointment" button.
+
+## Booking page
+
+One page to book an appointment with a doctor.
+
+### Features
+
+- Pick a date and a free time slot (taken or past slots are greyed out).
+- Choose a visit, meet and consult type (only the ones the doctor offers).
+- Write the problem, then book.
+
+## Dashboard page
+
+The home screen after login. It shows numbers and a calendar of appointments.
+
+### Features
+
+- Stat cards (today, upcoming, completed and totals).
+- A month calendar with a count on each day.
+- A day calendar coloured by status; the doctor can drag to reschedule.
+- A link to the prescriptions page.
+
+## Appointments page
+
+All of a user's appointments in one place, grouped by date.
+
+### Features
+
+- Tabs: All, Upcoming, Completed, Missed and Cancelled.
+- A colour badge for each status.
+- A countdown like "Today" or "In 3 days" on upcoming visits.
+- Each card opens the appointment details.
+
+## Appointment detail page
+
+The full details of one appointment, for the patient and the doctor.
+
+### Features
+
+- Doctor, patient and appointment details.
+- Doctor: reschedule, cancel, mark missed, and write or edit the prescription.
+- Patient: cancel before the time, read the prescription, download the PDF, leave a review and rebook.
+
+## Prescriptions page
+
+Completed visits that have a diagnosis or medicines.
+
+### Features
+
+- Doctor: open one to manage the diagnosis, medicines and instructions.
+- Patient: open one to read the prescription.
+- Visits with only instructions are not listed.
+
+## Notifications page
+
+The updates a user has received, grouped by date.
+
+### Features
+
+- Told when an appointment is rescheduled, cancelled, completed or missed.
+- The header bell shows the unread count.
+- Opening the page marks everything read.
+
+## Profile page
+
+A user's own details, edited in tabs. It sends the user to their doctor or patient profile.
+
+### Features
+
+- Doctor tabs: Basic Info, Professional, Availability.
+- Patient tabs: Basic Info, Medical History, Documents, Test Reports, Emergency and Insurance.
+- Each tab has its own Edit button and saves on its own.
+
 ## Tech used
 
 | Part | Tool |

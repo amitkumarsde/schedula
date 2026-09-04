@@ -1,10 +1,18 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Star, User, Award, Wallet, Clock } from "lucide-react";
+import { Star, User, Award, Wallet, Clock, Heart } from "lucide-react";
 import type { Doctor } from "@/types";
 
-// One doctor card that links to the doctor page.
-export default function DoctorCard({ doctor }: { doctor: Doctor }) {
+// One doctor card that links to the doctor page. Shows a save heart when onToggleSave is given.
+export default function DoctorCard({
+  doctor,
+  isSaved = false,
+  onToggleSave,
+}: {
+  doctor: Doctor;
+  isSaved?: boolean;
+  onToggleSave?: (doctorId: string) => void;
+}) {
   return (
     <Link
       href={`/doctors/${doctor._id}`}
@@ -29,10 +37,28 @@ export default function DoctorCard({ doctor }: { doctor: Doctor }) {
           <div className="flex items-start justify-between gap-2">
             <h3 className="truncate text-lg font-bold text-ink">{doctor.fullName}</h3>
 
-            <span className="flex shrink-0 items-center gap-1 text-sm text-muted">
-              {doctor.rating}
-              <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
-            </span>
+            <div className="flex shrink-0 items-center gap-2">
+              <span className="flex items-center gap-1 text-sm text-muted">
+                {doctor.rating}
+                <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+              </span>
+
+              {/* The save heart. preventDefault stops the click from opening the card. */}
+              {onToggleSave && (
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    onToggleSave(doctor._id);
+                  }}
+                  aria-label={isSaved ? "Remove from saved" : "Save doctor"}
+                  className="cursor-pointer text-muted transition-colors hover:text-danger"
+                >
+                  <Heart className={`h-5 w-5 ${isSaved ? "fill-danger text-danger opacity-80" : ""}`} />
+                </button>
+              )}
+            </div>
           </div>
 
           <p className="mt-0.5 text-sm font-medium text-brand">{doctor.specialization}</p>

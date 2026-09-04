@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Clock, ChevronRight } from "lucide-react";
-import { formatSlotLabel, appointmentHasStarted } from "@/lib/utils/schedule";
+import { formatSlotLabel, appointmentHasStarted, countdownLabel } from "@/lib/utils/schedule";
 import AppointmentStatusBadge from "@/features/appointments/components/AppointmentStatusBadge";
 import PendingActionBadge from "@/features/appointments/components/PendingActionBadge";
 import type { Appointment, UserRole } from "@/types";
@@ -21,6 +21,9 @@ export default function AppointmentCard({
   // An upcoming visit whose slot time has passed still needs the doctor to act.
   const needsAction =
     appointment.status === "upcoming" && appointmentHasStarted(appointment.appointmentDate, appointment.slotTime);
+  // A countdown like "Tomorrow" is shown only for an upcoming visit that has not started.
+  const countdown =
+    appointment.status === "upcoming" && !needsAction ? countdownLabel(appointment.appointmentDate) : "";
 
   return (
     <Link
@@ -32,7 +35,10 @@ export default function AppointmentCard({
           <h3 className="truncate font-semibold text-ink">{title}</h3>
           <span className="shrink-0 text-sm font-medium text-muted">#{appointment.appointmentNumber}</span>
         </div>
+        <div className="flex gap-2">
         {subtitle && <p className="truncate text-sm capitalize text-muted">{subtitle}</p>}
+        {countdown && <p className="mt-0.5 text-xs font-semibold text-brand">{countdown}</p>}
+        </div>
       </div>
 
       {needsAction ? (

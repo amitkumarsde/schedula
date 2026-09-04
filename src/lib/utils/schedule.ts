@@ -94,6 +94,25 @@ export function todayDateText() {
   return toDateText(today.getFullYear(), today.getMonth(), today.getDate());
 }
 
+// Whole days from today until a date (0 = today, 1 = tomorrow, negative = already past).
+export function daysUntil(dateText: string) {
+  const [year, month, day] = dateText.split("-").map(Number);
+  const target = new Date(year, month - 1, day);
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const oneDay = 1000 * 60 * 60 * 24;
+  return Math.round((target.getTime() - startOfToday.getTime()) / oneDay);
+}
+
+// A friendly countdown for an appointment date, like "Today", "Tomorrow" or "In 3 days".
+export function countdownLabel(dateText: string) {
+  const days = daysUntil(dateText);
+  if (days < 0) return "Past";
+  if (days === 0) return "Today";
+  if (days === 1) return "Tomorrow";
+  return `In ${days} days`;
+}
+
 // The first upcoming date, within 60 days, that falls on one of the given weekdays.
 export function firstWorkingDate(availableDays: string[]) {
   const today = new Date();

@@ -84,11 +84,6 @@ export default function DoctorPrescriptionForm({
 
   // Saves first, then marks the appointment completed.
   async function handleComplete() {
-    if (!diagnosis.trim()) {
-      toast.error("Please write a diagnosis before completing.");
-      return;
-    }
-
     setIsBusy(true);
     try {
       await savePrescription(appointmentId, userId, {

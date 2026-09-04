@@ -1,9 +1,11 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Search, X, SearchX } from "lucide-react";
+import { Search, X, SearchX, Heart } from "lucide-react";
 import { useDoctors } from "@/features/doctors/hooks/useDoctors";
 import { SPECIALIZATIONS } from "@/lib/utils/specializations";
+import { getSavedDoctorIds, toggleSavedDoctor } from "@/lib/utils/savedDoctors";
 import DoctorCard from "@/features/doctors/components/DoctorCard";
 import DoctorListSkeleton from "@/features/doctors/components/DoctorListSkeleton";
 import Alert from "@/components/ui/Alert";
@@ -18,6 +20,20 @@ export default function DoctorsBrowser() {
   const specialization = searchParams.get("specialization") ?? "";
 
   const { doctors, isLoading, errorMessage } = useDoctors(search, specialization);
+
+  // Saved (favourite) doctor ids are kept in the browser and read after mounting.
+  const [savedIds, setSavedIds] = useState<string[]>([]);
+  const [showSavedOnly, setShowSavedOnly] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSavedIds(getSavedDoctorIds());
+  }, []);
+
+  // Adds or removes one doctor from the saved list.
+  function toggleSave(doctorId: string) {
+    setSavedIds(toggleSavedDoctor(doctorId));
+  }
 
   // Puts the chosen filters into the URL.
   function applyFilters(nextSearch: string, nextSpecialization: string) {
@@ -37,6 +53,8 @@ export default function DoctorsBrowser() {
   }
 
   const hasFilters = Boolean(search || specialization);
+  // When the Saved toggle is on, show only the doctors the patient saved.
+  const shownDoctors = showSavedOnly ? doctors.filter((doctor) => savedIds.includes(doctor._id)) : doctors;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
@@ -87,21 +105,35 @@ export default function DoctorsBrowser() {
         })}
       </div>
 
-      <div className="mt-8 flex items-center justify-between gap-4">
+      <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
         <p className="text-sm text-muted">
-          {isLoading ? "Loading doctors..." : `${doctors.length} doctor(s) found`}
+          {isLoading ? "Loading doctors..." : `${shownDoctors.length} doctor(s) found`}
         </p>
 
-        {hasFilters && (
+        <div className="flex items-center gap-4">
+          {/* Toggle to show only the saved doctors. */}
           <button
             type="button"
-            onClick={() => router.push("/doctors")}
-            className="flex cursor-pointer items-center gap-1.5 text-sm font-medium text-brand hover:underline"
+            onClick={() => setShowSavedOnly((on) => !on)}
+            className={`flex cursor-pointer items-center gap-1.5 text-sm font-medium transition-colors ${
+              showSavedOnly ? "text-danger" : "text-muted hover:text-danger"
+            }`}
           >
-            <X className="h-4 w-4" />
-            Clear filters
+            <Heart className={`h-4 w-4 ${showSavedOnly ? "fill-danger text-danger" : ""}`} />
+            Saved{savedIds.length > 0 ? ` (${savedIds.length})` : ""}
           </button>
-        )}
+
+          {hasFilters && (
+            <button
+              type="button"
+              onClick={() => router.push("/doctors")}
+              className="flex cursor-pointer items-center gap-1.5 text-sm font-medium text-brand hover:underline"
+            >
+              <X className="h-4 w-4" />
+              Clear filters
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="mt-4">
@@ -109,20 +141,29 @@ export default function DoctorsBrowser() {
 
         {!isLoading && errorMessage && <Alert message={errorMessage} />}
 
-        {!isLoading && !errorMessage && doctors.length === 0 && (
+        {!isLoading && !errorMessage && shownDoctors.length === 0 && (
           <div className="rounded-2xl border border-line bg-surface p-12 text-center">
             <SearchX className="mx-auto h-10 w-10 text-muted" />
-            <p className="mt-4 font-semibold text-ink">No doctors found</p>
+            <p className="mt-4 font-semibold text-ink">
+              {showSavedOnly ? "No saved doctors yet" : "No doctors found"}
+            </p>
             <p className="mt-1 text-sm text-muted">
-              Try a different search word or remove the filters.
+              {showSavedOnly
+                ? "Tap the heart on a doctor to save them here."
+                : "Try a different search word or remove the filters."}
             </p>
           </div>
         )}
 
-        {!isLoading && doctors.length > 0 && (
+        {!isLoading && shownDoctors.length > 0 && (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {doctors.map((doctor) => (
-              <DoctorCard key={doctor._id} doctor={doctor} />
+            {shownDoctors.map((doctor) => (
+              <DoctorCard
+                key={doctor._id}
+                doctor={doctor}
+                isSaved={savedIds.includes(doctor._id)}
+                onToggleSave={toggleSave}
+              />
             ))}
           </div>
         )}

@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, CalendarClock, Download, RotateCcw } from "lucide-react";
 import Alert from "@/components/ui/Alert";
 import Button from "@/components/ui/Button";
-import Chip from "@/components/ui/Chip";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { useAppointment } from "@/features/appointments/hooks/useAppointment";
 import { updateAppointmentStatus } from "@/features/appointments/api/appointmentService";
@@ -15,7 +14,7 @@ import PendingActionBadge from "@/features/appointments/components/PendingAction
 import PrescriptionCard from "@/features/appointments/components/PrescriptionCard";
 import DoctorPrescriptionForm from "@/features/appointments/components/DoctorPrescriptionForm";
 import AppointmentReview from "@/features/appointments/components/AppointmentReview";
-import { formatLongDate, formatSlotLabel, appointmentHasStarted } from "@/lib/utils/schedule";
+import { formatLongDate, formatSlotLabel, appointmentHasStarted, countdownLabel } from "@/lib/utils/schedule";
 import { getGenderLabel } from "@/lib/utils/profileOptions";
 import { downloadPrescriptionPdf } from "@/lib/utils/prescriptionPdf";
 import { toast } from "react-toastify";
@@ -31,24 +30,6 @@ function Field({ label, value }: { label: string; value: string }) {
     <div>
       <p className="text-sm text-muted">{label}</p>
       <p className="mt-0.5 text-sm font-medium text-ink">{value || "N/A"}</p>
-    </div>
-  );
-}
-
-// A label with a row of chips, or "None" when the list is empty.
-function ChipField({ label, items }: { label: string; items: string[] }) {
-  return (
-    <div>
-      <p className="text-sm text-muted">{label}</p>
-      {items.length === 0 ? (
-        <p className="mt-0.5 text-sm font-medium text-ink">None</p>
-      ) : (
-        <div className="mt-2 flex flex-wrap gap-2">
-          {items.map((item, index) => (
-            <Chip key={index} label={item} />
-          ))}
-        </div>
-      )}
     </div>
   );
 }
@@ -127,9 +108,16 @@ export default function AppointmentDetail({ appointmentId }: { appointmentId: st
       </Link>
 
       <div className="flex items-center justify-between gap-4 border-b border-line pb-5">
-        <h1 className="text-2xl font-bold text-ink sm:text-3xl">
-          Appointment #{appointment.appointmentNumber}
-        </h1>
+        <div>
+          <h1 className="text-2xl font-bold text-ink sm:text-3xl">
+            Appointment #{appointment.appointmentNumber}
+          </h1>
+          {isUpcoming && !hasStarted && (
+            <p className="mt-1 text-sm font-semibold text-brand">
+              {countdownLabel(appointment.appointmentDate)}
+            </p>
+          )}
+        </div>
         {isUpcoming && hasStarted ? (
           <PendingActionBadge viewerRole={user.role} />
         ) : (
@@ -156,8 +144,8 @@ export default function AppointmentDetail({ appointmentId }: { appointmentId: st
               <Field label="Age" value={appointment.patient.age ? `${appointment.patient.age} years` : ""} />
             </div>
             <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
-              <ChipField label="Allergies" items={appointment.patient.allergies} />
-              <ChipField label="Diseases" items={appointment.patient.diseases} />
+              <Field label="Allergies" value={appointment.patient.allergies.join(", ")} />
+              <Field label="Diseases" value={appointment.patient.diseases.join(", ")} />
             </div>
           </section>
 

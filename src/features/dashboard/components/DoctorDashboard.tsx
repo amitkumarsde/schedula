@@ -2,12 +2,13 @@
 
 import { useEffect, useState, type ComponentType } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarDays, Clock, CheckCircle2, Users } from "lucide-react";
+import { CalendarDays, Clock, CheckCircle2, Users, FileText } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { useMyAppointments } from "@/features/appointments/hooks/useMyAppointments";
 import { useDoctorProfile } from "@/features/profile/hooks/useDoctorProfile";
 import { rescheduleAppointment } from "@/features/appointments/api/appointmentService";
 import AppCalendar from "@/components/ui/AppCalendar";
+import Button from "@/components/ui/Button";
 import SummaryCard from "@/components/ui/SummaryCard";
 import DayCalendar from "@/features/appointments/components/DayCalendar";
 import { makeSlotsForDoctor, weekdayName, todayDateText } from "@/lib/utils/schedule";
@@ -102,6 +103,13 @@ export default function DoctorDashboard() {
     <div className="mx-auto max-w-6xl px-4 py-8">
       <h1 className="text-2xl font-bold text-ink sm:text-3xl">Dashboard</h1>
       <p className="mt-1.5 text-sm text-muted">Welcome back, {user.fullName}.</p>
+
+      <div className="mt-4">
+        <Button href="/prescriptions" variant="outline">
+          <FileText className="h-4 w-4" />
+          Manage prescriptions
+        </Button>
+      </div>
 
       <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {stats.map((stat) => (

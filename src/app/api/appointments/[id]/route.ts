@@ -212,11 +212,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         return sendSuccess({ message: "Appointment marked as missed", appointment });
       }
 
-      // Complete: needs a diagnosis first.
-      if (!appointment.diagnosis) {
-        return sendError("Add a diagnosis before marking it completed");
-      }
-
+      // Complete: a diagnosis is optional, so a healthy visit can be finished too.
       appointment.status = "completed";
       await appointment.save();
 
