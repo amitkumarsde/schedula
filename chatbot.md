@@ -2,6 +2,8 @@
 
 This file explains the **AI chat assistant** in Schedula: what it is, how it works, and which files make it work.
 
+---
+
 ## What it is
 
 - A small **chat button** at the bottom right of every page.
@@ -10,8 +12,10 @@ This file explains the **AI chat assistant** in Schedula: what it is, how it wor
 - An AI helper answers in short, friendly words.
 - The empty chat shows a few **quick questions** you can tap instead of typing.
 - Some answers show a **link to the right page** (like doctors or profile), based on your question.
-- A logged in user's chat is **saved** and cleared on logout; a guest's chat is not saved.
+- If you are logged in, your chat is **saved** and cleared when you log out. A guest's chat is not saved.
 - It only helps with using the app. It does not give medical advice and never shares private user data.
+
+---
 
 ## How it works
 
@@ -24,6 +28,8 @@ This file explains the **AI chat assistant** in Schedula: what it is, how it wor
 - Every question carries one rule: only help with Schedula, keep it short, never share private data, never give a medical diagnosis.
 - The reply shows under your question. If the question is about a topic like doctors or profile, a link to that page appears with the answer.
 - On logout, a logged in user's whole chat is deleted.
+
+---
 
 ## The files that make it work
 
@@ -39,6 +45,8 @@ src/
 ```
 
 The chat button is added once in `src/app/layout.tsx`, so it shows on every page.
+
+---
 
 ## How to turn it on
 
@@ -57,3 +65,5 @@ OPENROUTER_MODEL=openrouter/free
 - The app tries Groq first, then OpenRouter.
 - `.env` is read only when the server starts, so restart it after any change.
 - Without any key, the app still runs; the chat button just says it is not available.
+
+---
