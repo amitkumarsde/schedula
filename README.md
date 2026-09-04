@@ -102,11 +102,11 @@ schedula/
 
 MongoDB holds these collections:
 
-- **users** — login account (name, email, password, role)
-- **doctors** — doctor profile (details, timings, appointments, notifications)
-- **patients** — patient profile (details, medical history, files, appointments, notifications)
-- **appointments** — one booking (date, slot, types, prescription, review, status)
-- **chatmessages** — one line of a chat with the assistant
+- **users** - login account (name, email, password, role)
+- **doctors** - doctor profile (details, timings, appointments, notifications)
+- **patients** - patient profile (details, medical history, files, appointments, notifications)
+- **appointments** - one booking (date, slot, types, prescription, review, status)
+- **chatmessages** - one line of a chat with the assistant
 
 ---
 

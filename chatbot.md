@@ -7,7 +7,7 @@ This file explains the **AI chat assistant** in Schedula: what it is, how it wor
 ## What it is
 
 - A small **chat button** at the bottom right of every page.
-- **Anyone can use it** — you do not need to log in.
+- **Anyone can use it** - you do not need to log in.
 - You ask "how do I..." questions about using Schedula (find a doctor, book, reschedule, cancel, prescriptions, profile).
 - An AI helper answers in short, friendly words.
 - The empty chat shows a few **quick questions** you can tap instead of typing.

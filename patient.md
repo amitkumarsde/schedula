@@ -8,11 +8,11 @@ This file lists **what a patient can do in Schedula** and **which files make it 
 
 - **Sign up and log in.** Create a patient account with full name, email and password.
 - **Fill the profile.** The profile page has a name card and tabs. Each tab has its own **Edit** button and saves on its own.
-  - **Basic Info** — age, gender, mobile number, weight, height, blood group, city, photo link. Saving this marks the account as complete.
-  - **Medical History** — allergies, diseases and current medications, added as chips.
-  - **Documents** — links to your documents.
-  - **Test Reports** — links to your test reports.
-  - **Emergency & Insurance** — emergency contact and insurance details.
+  - **Basic Info** - age, gender, mobile number, weight, height, blood group, city, photo link. Saving this marks the account as complete.
+  - **Medical History** - allergies, diseases and current medications, added as chips.
+  - **Documents** - links to your documents.
+  - **Test Reports** - links to your test reports.
+  - **Emergency & Insurance** - emergency contact and insurance details.
 - **Find a doctor.** Open `/doctors`. Search by name, specialization or city, or tap a specialization chip.
 - **Save a doctor.** Tap the heart on a doctor card to save them, then use the **Saved** toggle to see only your saved doctors. Saved doctors are kept in your browser.
 - **Open a doctor.** See the photo, about, consulting time, slot length, fee, and a **Book appointment** button.

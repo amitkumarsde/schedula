@@ -8,9 +8,9 @@ This file lists **what a doctor can do in Schedula** and **which files make it w
 
 - **Sign up and log in.** Create a doctor account with full name, email and password. A new doctor is hidden from the doctors list until the profile is ready.
 - **Fill the profile.** The profile page has a name card and three tabs. Each tab has its own **Edit** button and saves on its own.
-  - **Basic Info** — name, gender, mobile number, city, photo link. Saving this marks the account as complete.
-  - **Professional** — specialization, qualification, experience, hospital, and an "about you" note.
-  - **Availability** — consulting days, start and end time, slot length, break between slots, fee, the visit / meet / consult types offered, and a **"Show me on the doctors list"** switch.
+  - **Basic Info** - name, gender, mobile number, city, photo link. Saving this marks the account as complete.
+  - **Professional** - specialization, qualification, experience, hospital, and an "about you" note.
+  - **Availability** - consulting days, start and end time, slot length, break between slots, fee, the visit / meet / consult types offered, and a **"Show me on the doctors list"** switch.
 - **Show up in the list.** A doctor appears at `/doctors` only when the specialization is filled, the switch is on, start and end times are set, and there is at least one of each option type.
 - **Get booked.** Patients pick a date, a free slot, and only the option types the doctor offers. Taken or past slots are greyed out, so a time is never booked twice.
 - **See the dashboard.** `/dashboard` shows the day's numbers (today's patients, upcoming, completed, total patients), a month calendar with a count on each day, a day calendar of the slots, and a link to the prescriptions page.
